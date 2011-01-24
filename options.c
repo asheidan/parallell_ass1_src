@@ -35,20 +35,29 @@ void usage(FILE *stream) {
 
 void help(FILE *stream) {
 	usage(stream);
+	fprintf(stream, "\n");
+
 	fprintf(stream, "\tReal values\n");
 	fprintf(stream, "  -x, --min-x=REAL\t\tMinimum value for X\n");
 	fprintf(stream, "  -X, --max-x=REAL\t\tMaximum value for X\n");
+	fprintf(stream, "\n");
 
 	fprintf(stream, "\tImaginary values\n");
 	fprintf(stream, "  -y, --min-y=IMAGINARY\t\tMinimum value for Y\n");
 	fprintf(stream, "  -Y, --max-y=IMAGINARY\t\tMaximum value for Y\n");
+	fprintf(stream, "\n");
 
 	fprintf(stream, "\tImage information\n");
 	fprintf(stream, "  -G, --geometry=WIDTHxHEIGHT\tResolution of the image (ie 1280x1024)\n");
 	fprintf(stream, "  -P, --palette=COLORS\t\tNumber of colors in palette\n");
 	fprintf(stream, "  -C, --continuous\t\tContinous smoothing of colors\n");
+	fprintf(stream, "\n");
 
 	fprintf(stream, "\tCalculation\n");
+	/*fprintf(stream, "  -M, --magic[=MINSIZE]\t\tUse magic boxes width minimum size of MINSIZE\n");*/
+	/*fprintf(stream, "      --threads[=NUMBER]\tUse NUMBER threads to calculate image\n");*/
+	/*fprintf(stream, "      --openmp\tUse OpenMP threads\n");*/
+	/*fprintf(stream, "      --pthread\tUse PThreads threads\n");*/
 	fprintf(stream, "  -I, --max-iter=ITERATIONS\tMaximum number of iterations\n");
 	fprintf(stream, "  -T, --threshold=VALUE\t\tThreshold value\n");
 	fprintf(stream, "  -t, --time\t\t\tPrint execution time on stdout\n");
