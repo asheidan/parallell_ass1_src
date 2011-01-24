@@ -17,9 +17,10 @@ long double max_y =  1.0;
 
 unsigned int palette_size = 300;
 
-bool output_to_terminal;
+bool output_to_terminal = false;
 char *filename = "output.ppm";
 
+bool continous_smoothing = false;
 void option_error(FILE *stream) {
 	fprintf(stream,"Try `%s --help` for more information.\n",PROG_NAME);
 }
@@ -33,19 +34,25 @@ void help(FILE *stream) {
 	fprintf(stream, "\tReal values\n");
 	fprintf(stream, "  -x, --min-x=REAL\t\tMinimum value for X\n");
 	fprintf(stream, "  -X, --max-x=REAL\t\tMaximum value for X\n");
+
 	fprintf(stream, "\tImaginary values\n");
 	fprintf(stream, "  -y, --min-y=IMAGINARY\t\tMinimum value for Y\n");
 	fprintf(stream, "  -Y, --max-y=IMAGINARY\t\tMaximum value for Y\n");
+
 	fprintf(stream, "\tImage information\n");
 	fprintf(stream, "  -G, --geometry=WIDTHxHEIGHT\tResolution of the image (ie 1280x1024)\n");
 	fprintf(stream, "  -P, --palette=COLORS\t\tNumber of colors in palette\n");
+	fprintf(stream, "  -C, --continuous\t\tContinous smoothing of colors\n");
+
 	fprintf(stream, "\tCalculation\n");
 	fprintf(stream, "  -I, --max-iter=ITERATIONS\tMaximum number of iterations\n");
 	fprintf(stream, "  -T, --threshold=VALUE\t\tThreshold value\n");
 	fprintf(stream, "\n");
+
 	fprintf(stream, "  -F, --file=FILENAME\t\tThreshold value\n");
 	fprintf(stream, "  -c\t\t\t\tWrite image to stdout\n");
 	fprintf(stream, "\n");
+
 	fprintf(stream, "  -h, --help\t\t\tShow this help message\n");
 }
 
@@ -72,6 +79,7 @@ void parse_options(int argc, char *argv[]) {
 		{"geometry", required_argument, 0, 'G'},
 		{"iterations", required_argument, 0, 'I'},
 		{"palette", required_argument, 0, 'P'},
+		{"continous", no_argument, 0, 'C'},
 		{"threshold", required_argument, 0, 'T'},
 		{"file", required_argument, 0, 'F'},
 		{0, 0, 0, 0}
@@ -82,6 +90,7 @@ void parse_options(int argc, char *argv[]) {
 		int option_index;
 		int c;
 		c = getopt_long(argc, argv, "cF:I:T:P:x:X:y:Y:G:h", long_options, &option_index);
+		c = getopt_long(argc, argv, "cCDtvF:I:T:P:x:X:y:Y:G:h", long_options, &option_index);
 
 		/* End of options */
 		if(c == -1) {
@@ -125,6 +134,8 @@ void parse_options(int argc, char *argv[]) {
 				break;
 			case 'P':
 				palette_size = (int)strtoul(optarg,NULL,10);
+			case 'C':
+				continous_smoothing = true;
 				break;
 			case 'x':
 				min_x = strtold(optarg,NULL);
