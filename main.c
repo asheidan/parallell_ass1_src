@@ -5,6 +5,7 @@
 
 #include "options.h"
 #include "render.h"
+#include "timer.h"
 #include "ppm.h"
 
 int main(int argc, char *argv[]) {
@@ -12,12 +13,15 @@ int main(int argc, char *argv[]) {
 	unsigned int
 		buffer_size;
 	FILE *output;
+	double time;
 
 	parse_options(argc,argv);
-	fprintf(stderr,
-			"Image: [I:%5u] [T:%3u] (%Lf,%Lf)-(%Lf,%Lf) [%ux%u]\n",
-			iteration_max, threshold, min_x,min_y,max_x,max_y,res_x,res_y
-		);
+	if(verbosity) {
+		fprintf(stderr,
+				"Image: [I:%5u] [T:%3u] (%Lf,%Lf)-(%Lf,%Lf) [%ux%u]\n",
+				iteration_max, threshold, min_x,min_y,max_x,max_y,res_x,res_y
+			);
+	}
 
 	buffer_size = res_x * res_y;
 	image = malloc(sizeof(unsigned int) * buffer_size);
@@ -40,7 +44,12 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+	if(print_time) timer_start();
 	render(buffer_size, image);
+	if(print_time) {
+		time = timer_check();
+		fprintf(stdout, "%lf\n", time);
+	}
 
 	ppm_write(res_x, res_y, image, output);
 

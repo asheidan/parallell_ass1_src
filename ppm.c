@@ -67,15 +67,8 @@ void ppm_write(int width, int height , unsigned int *buffer, FILE *stream) {
 	colors = palette(palette_size);
 
 	fprintf(stream, "P6\n");
-	fprintf(stream, "%d %d\n%d\n", width, height, 255);
-
-	/*
-	for(tmp= 0; tmp < 5; tmp++) {
-		for(i = 0; i < width; i++) {
-			fwrite(colors[i * palette_size / width], sizeof(color_t), 1, stream);
-		}
-	}
-	*/
+	if(verbosity > 1) fprintf(stream, "%d %d\n%d\n", width, height+5, 255);
+	else fprintf(stream, "%d %d\n%d\n", width, height, 255);
 
 	for(i = 0; i < buffer_size; i++) {
 		tmp = buffer[i];
@@ -84,6 +77,14 @@ void ppm_write(int width, int height , unsigned int *buffer, FILE *stream) {
 		}
 		else {
 			fwrite(colors[tmp % (palette_size) + 1], sizeof(color_t), 1, stream);
+		}
+	}
+
+	if(verbosity > 1) {
+		for(tmp= 0; tmp < 5; tmp++) {
+			for(i = 0; i < width; i++) {
+				fwrite(colors[i * palette_size / width], sizeof(color_t), 1, stream);
+			}
 		}
 	}
 

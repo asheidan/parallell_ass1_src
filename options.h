@@ -24,6 +24,7 @@ extern bool output_to_terminal;
 extern char *filename;
 
 extern bool continous_smoothing;
+extern bool print_time;
 
 extern unsigned int verbosity;
 

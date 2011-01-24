@@ -21,6 +21,7 @@ bool output_to_terminal = false;
 char *filename = "output.ppm";
 
 bool continous_smoothing = false;
+bool print_time = false;
 
 unsigned int verbosity = 0;
 
@@ -50,6 +51,7 @@ void help(FILE *stream) {
 	fprintf(stream, "\tCalculation\n");
 	fprintf(stream, "  -I, --max-iter=ITERATIONS\tMaximum number of iterations\n");
 	fprintf(stream, "  -T, --threshold=VALUE\t\tThreshold value\n");
+	fprintf(stream, "  -t, --time\t\t\tPrint execution time on stdout\n");
 	fprintf(stream, "\n");
 
 	fprintf(stream, "  -F, --file=FILENAME\t\tThreshold value\n");
@@ -86,6 +88,7 @@ void parse_options(int argc, char *argv[]) {
 		{"continous", no_argument, 0, 'C'},
 		{"threshold", required_argument, 0, 'T'},
 		{"file", required_argument, 0, 'F'},
+		{"time", required_argument, 0, 't'},
 		{"verbose", optional_argument, 0, 'v'},
 		{0, 0, 0, 0}
 	};
@@ -94,7 +97,6 @@ void parse_options(int argc, char *argv[]) {
 	for(;;) {
 		int option_index;
 		int c;
-		c = getopt_long(argc, argv, "cF:I:T:P:x:X:y:Y:G:h", long_options, &option_index);
 		c = getopt_long(argc, argv, "cCDtvF:I:T:P:x:X:y:Y:G:h", long_options, &option_index);
 
 		/* End of options */
@@ -123,6 +125,9 @@ void parse_options(int argc, char *argv[]) {
 				exit(1);
 			case 'c':
 				output_to_terminal = true;
+				break;
+			case 't':
+				print_time = true;
 				break;
 			case 'v':
 				if(optarg == NULL) {
