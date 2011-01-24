@@ -2,6 +2,7 @@
 #define __OPTIONS_H__
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #define PROG_NAME "frac"
 
@@ -18,6 +19,9 @@ extern long double min_y;
 extern long double max_y;
 
 extern unsigned int palette_size;
+
+extern bool output_to_terminal;
+extern char *filename;
 
 void usage(FILE *stream);
 void help(FILE *stream);

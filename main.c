@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <string.h>
 
 #include "options.h"
 #include "render.h"
@@ -9,6 +11,7 @@ int main(int argc, char *argv[]) {
 	unsigned int *image;
 	unsigned int
 		buffer_size;
+	FILE *output;
 
 	parse_options(argc,argv);
 	fprintf(stderr,
@@ -23,9 +26,23 @@ int main(int argc, char *argv[]) {
 		exit(3);
 	}
 
+	if(output_to_terminal) {
+		output = stdout;
+	}
+	else {
+		output = fopen(filename, "w");
+		if(output == NULL) {
+			fprintf(stderr,
+					"%s: Opening file '%s' for output failed: %s\n",
+					PROG_NAME, filename, strerror(errno)
+				);
+			exit(-4);
+		}
+	}
+
 	render(buffer_size, image);
 
-	ppm_write(res_x, res_y, image);
+	ppm_write(res_x, res_y, image, output);
 
 	free(image);
 

@@ -3,38 +3,6 @@
 
 #include "options.h"
 
-void option_error(FILE *stream) {
-	fprintf(stream,"Try `%s --help` for more information.\n",PROG_NAME);
-}
-
-void usage(FILE *stream) {
-	fprintf(stream, "Usage: %s [OPTIONS]\n", PROG_NAME);
-}
-
-void help(FILE *stream) {
-	usage(stream);
-	fprintf(stream, "\tCalculation\n");
-	fprintf(stream, "  -I, --max-iter=ITERATIONS\tMaximum number of iterations\n");
-	fprintf(stream, "  -T, --threshold=VALUE\tThreshold value\n");
-	fprintf(stream, "\tReal values\n");
-	fprintf(stream, "  -x, --min-x=REAL\tMinimum value for X\n");
-	fprintf(stream, "  -X, --max-x=REAL\tMaximum value for X\n");
-	fprintf(stream, "\tImaginary values\n");
-	fprintf(stream, "  -y, --min-y=IMAGINARY\tMinimum value for Y\n");
-	fprintf(stream, "  -Y, --max-y=IMAGINARY\tMaximum value for Y\n");
-	fprintf(stream, "\tImage information\n");
-	fprintf(stream, "      --geometry=WIDTHxHEIGHT\tResolution of the image (ie 1280x1024)\n");
-	fprintf(stream, "  -P, --palette=COLORS\t\tNumber of colors in palette\n");
-	fprintf(stream, "\n");
-	fprintf(stream, "  -h, --help\t\tShow this help message\n");
-}
-
-void usage_error(const char *message) {
-		usage(stderr);
-		fprintf(stderr, "\t%s\n",message);
-		exit(-1);
-}
-
 unsigned int iteration_max = 1000;
 unsigned int threshold = 2;
 
@@ -48,6 +16,44 @@ long double min_y = -1.0;
 long double max_y =  1.0;
 
 unsigned int palette_size = 300;
+
+bool output_to_terminal;
+char *filename = "output.ppm";
+
+void option_error(FILE *stream) {
+	fprintf(stream,"Try `%s --help` for more information.\n",PROG_NAME);
+}
+
+void usage(FILE *stream) {
+	fprintf(stream, "Usage: %s [OPTIONS]\n", PROG_NAME);
+}
+
+void help(FILE *stream) {
+	usage(stream);
+	fprintf(stream, "\tReal values\n");
+	fprintf(stream, "  -x, --min-x=REAL\t\tMinimum value for X\n");
+	fprintf(stream, "  -X, --max-x=REAL\t\tMaximum value for X\n");
+	fprintf(stream, "\tImaginary values\n");
+	fprintf(stream, "  -y, --min-y=IMAGINARY\t\tMinimum value for Y\n");
+	fprintf(stream, "  -Y, --max-y=IMAGINARY\t\tMaximum value for Y\n");
+	fprintf(stream, "\tImage information\n");
+	fprintf(stream, "  -G, --geometry=WIDTHxHEIGHT\tResolution of the image (ie 1280x1024)\n");
+	fprintf(stream, "  -P, --palette=COLORS\t\tNumber of colors in palette\n");
+	fprintf(stream, "\tCalculation\n");
+	fprintf(stream, "  -I, --max-iter=ITERATIONS\tMaximum number of iterations\n");
+	fprintf(stream, "  -T, --threshold=VALUE\t\tThreshold value\n");
+	fprintf(stream, "\n");
+	fprintf(stream, "  -F, --file=FILENAME\t\tThreshold value\n");
+	fprintf(stream, "  -c\t\t\t\tWrite image to stdout\n");
+	fprintf(stream, "\n");
+	fprintf(stream, "  -h, --help\t\t\tShow this help message\n");
+}
+
+void usage_error(const char *message) {
+		usage(stderr);
+		fprintf(stderr, "\t%s\n",message);
+		exit(-1);
+}
 
 void parse_geometry(const char *geometry) {
 	char *p;
@@ -67,6 +73,7 @@ void parse_options(int argc, char *argv[]) {
 		{"iterations", required_argument, 0, 'I'},
 		{"palette", required_argument, 0, 'P'},
 		{"threshold", required_argument, 0, 'T'},
+		{"file", required_argument, 0, 'F'},
 		{0, 0, 0, 0}
 	};
 
@@ -74,7 +81,7 @@ void parse_options(int argc, char *argv[]) {
 	for(;;) {
 		int option_index;
 		int c;
-		c = getopt_long(argc, argv, "I:T:P:x:X:y:Y:G:h", long_options, &option_index);
+		c = getopt_long(argc, argv, "cF:I:T:P:x:X:y:Y:G:h", long_options, &option_index);
 
 		/* End of options */
 		if(c == -1) {
@@ -100,6 +107,12 @@ void parse_options(int argc, char *argv[]) {
 			case 'h':
 				usage(stdout);
 				exit(1);
+			case 'c':
+				output_to_terminal = true;
+				break;
+			case 'F':
+				filename = optarg;
+				break;
 			case 'H':
 				help(stdout);
 				exit(1);
