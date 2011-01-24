@@ -5,19 +5,19 @@
 
 #define PROG_NAME "frac"
 
-extern int iteration_max;
-extern int threshold;
+extern unsigned int iteration_max;
+extern unsigned int threshold;
 
-extern int res_x;
-extern int res_y;
+extern unsigned int res_x;
+extern unsigned int res_y;
 
-extern double min_x;
-extern double max_x;
+extern long double min_x;
+extern long double max_x;
 
-extern double min_y;
-extern double max_y;
+extern long double min_y;
+extern long double max_y;
 
-extern int palette_size;
+extern unsigned int palette_size;
 
 void usage(FILE *stream);
 void help(FILE *stream);

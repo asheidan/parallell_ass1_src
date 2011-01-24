@@ -35,19 +35,19 @@ void usage_error(const char *message) {
 		exit(-1);
 }
 
-int iteration_max = 1000;
-int threshold = 2;
+unsigned int iteration_max = 1000;
+unsigned int threshold = 2;
 
-int res_x = 600;
-int res_y = 400;
+unsigned int res_x = 600;
+unsigned int res_y = 400;
 
-double min_x = -2.0;
-double max_x =  1.0;
+long double min_x = -2.0;
+long double max_x =  1.0;
 
-double min_y = -1.0;
-double max_y =  1.0;
+long double min_y = -1.0;
+long double max_y =  1.0;
 
-int palette_size = 255;
+unsigned int palette_size = 300;
 
 void parse_geometry(const char *geometry) {
 	char *p;
@@ -114,16 +114,16 @@ void parse_options(int argc, char *argv[]) {
 				palette_size = (int)strtoul(optarg,NULL,10);
 				break;
 			case 'x':
-				min_x = strtod(optarg,NULL);
+				min_x = strtold(optarg,NULL);
 				break;
 			case 'X':
-				max_x = strtod(optarg,NULL);
+				max_x = strtold(optarg,NULL);
 				break;
 			case 'y':
-				min_y = strtod(optarg,NULL);
+				min_y = strtold(optarg,NULL);
 				break;
 			case 'Y':
-				max_y = strtod(optarg,NULL);
+				max_y = strtold(optarg,NULL);
 				break;
 			case 'G':
 				/* Parse string */

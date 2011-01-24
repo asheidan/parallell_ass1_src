@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
 
 	parse_options(argc,argv);
 	fprintf(stderr,
-			"Image: [I:%5d] [T:%3d] (%lf,%lf)-(%lf,%lf) [%dx%d]\n",
+			"Image: [I:%5u] [T:%3u] (%Lf,%Lf)-(%Lf,%Lf) [%ux%u]\n",
 			iteration_max, threshold, min_x,min_y,max_x,max_y,res_x,res_y
 		);
 
