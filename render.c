@@ -1,12 +1,12 @@
 #include "render.h"
 #include "options.h"
 
-int render(int buffer_size, int *buffer) {
+void render(unsigned int buffer_size, unsigned int *buffer) {
 	int
 		iteration,
 		iteration_count,
 		x, y;
-	double
+	long double
 		zr, zi, cr, ci,
 		tmp,
 		interval_x,
@@ -44,9 +44,6 @@ int render(int buffer_size, int *buffer) {
 				zr = tmp;
 			}
 			buffer[res_x * y + x] = iteration;
-			if(iteration > iteration_count && iteration < iteration_max) {
-				iteration_count = iteration;
-			}
 			/*
 			fprintf(stderr,
 					"[%3d,%3d] [i:%4d] [c: %lf + i*%lf]\n",
@@ -54,6 +51,4 @@ int render(int buffer_size, int *buffer) {
 			*/
 		}
 	}
-
-	return iteration_count;
 }

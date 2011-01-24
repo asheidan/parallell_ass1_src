@@ -6,10 +6,9 @@
 #include "ppm.h"
 
 int main(int argc, char *argv[]) {
-	int *image;
-	int
-		buffer_size,
-		iteration_count;
+	unsigned int *image;
+	unsigned int
+		buffer_size;
 
 	parse_options(argc,argv);
 	fprintf(stderr,
@@ -18,7 +17,7 @@ int main(int argc, char *argv[]) {
 		);
 
 	buffer_size = res_x * res_y;
-	image = malloc(sizeof(int) * buffer_size);
+	image = malloc(sizeof(unsigned int) * buffer_size);
 	if(image == NULL) {
 		perror(PROG_NAME);
 		exit(3);
@@ -26,7 +25,9 @@ int main(int argc, char *argv[]) {
 
 	render(buffer_size, image);
 
-	ppm_write(res_x, res_y, image, iteration_count);
+	ppm_write(res_x, res_y, image);
+
+	free(image);
 
 	return 0;
 }

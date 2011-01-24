@@ -17,6 +17,8 @@ extern double max_x;
 extern double min_y;
 extern double max_y;
 
+extern int palette_size;
+
 void usage(FILE *stream);
 void help(FILE *stream);
 

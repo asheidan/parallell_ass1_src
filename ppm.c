@@ -1,24 +1,92 @@
 #include "ppm.h"
+#include <stdlib.h>
 #include <stdio.h>
 
 #include "options.h"
 
+#define R 0
+#define G 1
+#define B 2
 
-void ppm_write(int width, int height , int *buffer, int max_count) {
-	int buffer_size,i, tmp;
+typedef unsigned char color_t[3];
+
+color_t *palette(unsigned int size) {
+	color_t
+		*colors;
+	unsigned int
+		i, steps;
+	colors = malloc(sizeof(color_t) * (size + 1));
+	if(colors == NULL) {
+		perror(PROG_NAME);
+		exit(3);
+	}
+
+	colors[0][R] = 0;
+	colors[0][G] = 0;
+	colors[0][B] = 0;
+
+	steps = 1275;
+
+	for(i = 1; i < 255; i++ ) {
+		colors[(i * palette_size) / steps + 1][R] = 1;
+		colors[(i * palette_size) / steps + 1][G] = 1;
+		colors[(i * palette_size) / steps + 1][B] = (i % 255) + 1;
+	}
+	for(; i < 510; i++) {
+		colors[(i * palette_size) / steps + 1][R] = (i % 255) + 1;
+		colors[(i * palette_size) / steps + 1][G] = (i % 255) + 1;
+		colors[(i * palette_size) / steps + 1][B] = 255;
+	}
+	for(; i < 765; i++) {
+		colors[(i * palette_size) / steps + 1][R] = 255;
+		colors[(i * palette_size) / steps + 1][G] = 255;
+		colors[(i * palette_size) / steps + 1][B] = 255 - ( i % 255 );
+	}
+	for(; i < 1020; i++) {
+		colors[(i * palette_size) / steps + 1][R] = 255;
+		colors[(i * palette_size) / steps + 1][G] = 255 - ( i % 255 );
+		colors[(i * palette_size) / steps + 1][B] = 1;
+	}
+	for(; i < 1275; i++) {
+		colors[(i * palette_size) / steps + 1][R] = 255 - ( i % 255 );
+		colors[(i * palette_size) / steps + 1][G] = 1;
+		colors[(i * palette_size) / steps + 1][B] = 1;
+	}
+	/*fprintf(stderr, "0x%02x%02x%02x\n", colors[i][R], colors[i][G], colors[i][B]);*/
+
+	return colors;
+}
+
+void ppm_write(int width, int height , unsigned int *buffer) {
+	unsigned int buffer_size,i;
+	unsigned int tmp;
 	buffer_size = width * height;
+
+	color_t
+		*colors;
+
+	colors = palette(palette_size);
 
 	fprintf(stdout, "P6\n");
 	fprintf(stdout, "%d %d\n%d\n", width, height, 255);
 
-	for(i = 0; i < (3 * buffer_size); i++) {
-		tmp = buffer[i/3];
-		/*fprintf(stderr, "D: 0x%02x\n", buffer[i/3] % 256);*/
-		if(tmp == iteration_max) {
-			fputc(0,stdout);
-		}
-		else {
-			fputc(tmp % 255, stdout);
+	/*
+	for(tmp= 0; tmp < 5; tmp++) {
+		for(i = 0; i < width; i++) {
+			fwrite(colors[i * palette_size / width], sizeof(color_t), 1, stdout);
 		}
 	}
+	*/
+
+	for(i = 0; i < buffer_size; i++) {
+		tmp = buffer[i];
+		if(tmp == iteration_max) {
+			fwrite(colors[0], sizeof(color_t), 1, stdout);
+		}
+		else {
+			fwrite(colors[tmp % (palette_size) + 1], sizeof(color_t), 1, stdout);
+		}
+	}
+
+	free(colors);
 }

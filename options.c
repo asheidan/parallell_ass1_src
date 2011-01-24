@@ -24,6 +24,7 @@ void help(FILE *stream) {
 	fprintf(stream, "  -Y, --max-y=IMAGINARY\tMaximum value for Y\n");
 	fprintf(stream, "\tImage information\n");
 	fprintf(stream, "      --geometry=WIDTHxHEIGHT\tResolution of the image (ie 1280x1024)\n");
+	fprintf(stream, "  -P, --palette=COLORS\t\tNumber of colors in palette\n");
 	fprintf(stream, "\n");
 	fprintf(stream, "  -h, --help\t\tShow this help message\n");
 }
@@ -38,13 +39,15 @@ int iteration_max = 1000;
 int threshold = 2;
 
 int res_x = 600;
-int res_y = 600;
+int res_y = 400;
 
 double min_x = -2.0;
 double max_x =  1.0;
 
-double min_y = -1.5;
-double max_y =  1.5;
+double min_y = -1.0;
+double max_y =  1.0;
+
+int palette_size = 255;
 
 void parse_geometry(const char *geometry) {
 	char *p;
@@ -62,6 +65,7 @@ void parse_options(int argc, char *argv[]) {
 		{"max-y", required_argument, 0, 'Y'},
 		{"geometry", required_argument, 0, 'G'},
 		{"iterations", required_argument, 0, 'I'},
+		{"palette", required_argument, 0, 'P'},
 		{"threshold", required_argument, 0, 'T'},
 		{0, 0, 0, 0}
 	};
@@ -70,7 +74,7 @@ void parse_options(int argc, char *argv[]) {
 	for(;;) {
 		int option_index;
 		int c;
-		c = getopt_long(argc, argv, "I:T:x:X:y:Y:G:h", long_options, &option_index);
+		c = getopt_long(argc, argv, "I:T:P:x:X:y:Y:G:h", long_options, &option_index);
 
 		/* End of options */
 		if(c == -1) {
@@ -104,7 +108,10 @@ void parse_options(int argc, char *argv[]) {
 				break;
 			case 'T':
 				/* Parse int */
-				threshold = (int)strtol(optarg,NULL,10);
+				threshold = (int)strtoul(optarg,NULL,10);
+				break;
+			case 'P':
+				palette_size = (int)strtoul(optarg,NULL,10);
 				break;
 			case 'x':
 				min_x = strtod(optarg,NULL);
