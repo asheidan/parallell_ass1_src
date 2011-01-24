@@ -21,6 +21,9 @@ bool output_to_terminal = false;
 char *filename = "output.ppm";
 
 bool continous_smoothing = false;
+
+unsigned int verbosity = 0;
+
 void option_error(FILE *stream) {
 	fprintf(stream,"Try `%s --help` for more information.\n",PROG_NAME);
 }
@@ -54,6 +57,7 @@ void help(FILE *stream) {
 	fprintf(stream, "\n");
 
 	fprintf(stream, "  -h, --help\t\t\tShow this help message\n");
+	fprintf(stream, "  -v, --verbose[=LEVEL]\t\tIncrease or set verbosity level\n");
 }
 
 void usage_error(const char *message) {
@@ -82,6 +86,7 @@ void parse_options(int argc, char *argv[]) {
 		{"continous", no_argument, 0, 'C'},
 		{"threshold", required_argument, 0, 'T'},
 		{"file", required_argument, 0, 'F'},
+		{"verbose", optional_argument, 0, 'v'},
 		{0, 0, 0, 0}
 	};
 
@@ -119,6 +124,14 @@ void parse_options(int argc, char *argv[]) {
 			case 'c':
 				output_to_terminal = true;
 				break;
+			case 'v':
+				if(optarg == NULL) {
+					verbosity++;
+				}
+				else {
+					verbosity = (unsigned int)strtoul(optarg,NULL,0);
+				}
+				break;
 			case 'F':
 				filename = optarg;
 				break;
@@ -126,14 +139,15 @@ void parse_options(int argc, char *argv[]) {
 				help(stdout);
 				exit(1);
 			case 'I':
-				iteration_max = (int)strtoul(optarg,NULL,10);
+				iteration_max = (unsigned int)strtoul(optarg,NULL,0);
 				break;
 			case 'T':
 				/* Parse int */
-				threshold = (int)strtoul(optarg,NULL,10);
+				threshold = (unsigned int)strtoul(optarg,NULL,0);
 				break;
 			case 'P':
-				palette_size = (int)strtoul(optarg,NULL,10);
+				palette_size = (unsigned int)strtoul(optarg,NULL,0);
+				break;
 			case 'C':
 				continous_smoothing = true;
 				break;

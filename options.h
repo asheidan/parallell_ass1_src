@@ -23,6 +23,10 @@ extern unsigned int palette_size;
 extern bool output_to_terminal;
 extern char *filename;
 
+extern bool continous_smoothing;
+
+extern unsigned int verbosity;
+
 void usage(FILE *stream);
 void help(FILE *stream);
 
