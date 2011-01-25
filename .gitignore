@@ -1,4 +1,5 @@
 *.o
+.*.sw?
 tags
 frac
 .sconsign.dblite
