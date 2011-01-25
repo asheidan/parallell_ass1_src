@@ -1,4 +1,5 @@
 #include <stdlib.h>
+
 #include <getopt.h>
 
 #include "options.h"
@@ -85,6 +86,10 @@ void parse_geometry(const char *geometry) {
 }
 
 void parse_options(int argc, char *argv[]) {
+	long double
+		center_x = 0, center_y = 0,
+		vertical_diameter = 0,
+		horizontal_diameter = 0;
 	static struct option long_options[] = {
 		{"help", no_argument, 0, 'H'},
 		{"min-x", required_argument, 0, 'x'},
@@ -99,6 +104,10 @@ void parse_options(int argc, char *argv[]) {
 		{"file", required_argument, 0, 'F'},
 		{"time", required_argument, 0, 't'},
 		{"verbose", optional_argument, 0, 'v'},
+		{"center-x", required_argument, 0, 'r'},
+		{"center-y", required_argument, 0, 'i'},
+		{"real-diameter", required_argument, 0, 'w'},
+		{"imaginary-diameter", required_argument, 0, 'h'},
 		{0, 0, 0, 0}
 	};
 
@@ -106,7 +115,7 @@ void parse_options(int argc, char *argv[]) {
 	for(;;) {
 		int option_index;
 		int c;
-		c = getopt_long(argc, argv, "cCDtvF:I:T:P:x:X:y:Y:G:h", long_options, &option_index);
+		c = getopt_long(argc, argv, "cCDtvF:I:T:P:x:X:y:Y:r:i:G:h:w:", long_options, &option_index);
 
 		/* End of options */
 		if(c == -1) {
@@ -129,9 +138,9 @@ void parse_options(int argc, char *argv[]) {
 				}
 				printf("\n");
 				break;
-			case 'h':
-				usage(stdout);
-				exit(1);
+			/*case 'h':*/
+				/*usage(stdout);*/
+				/*exit(1);*/
 			case 'c':
 				output_to_terminal = true;
 				break;
@@ -167,6 +176,7 @@ void parse_options(int argc, char *argv[]) {
 				break;
 			case 'x':
 				min_x = strtold(optarg,NULL);
+				fprintf(stderr, "%s: %Le\n", optarg, min_x);
 				break;
 			case 'X':
 				max_x = strtold(optarg,NULL);
@@ -177,12 +187,33 @@ void parse_options(int argc, char *argv[]) {
 			case 'Y':
 				max_y = strtold(optarg,NULL);
 				break;
+			case 'i':
+				center_y = strtold(optarg,NULL);
+				break;
+			case 'r':
+				center_x = strtold(optarg,NULL);
+				break;
+			case 'w':
+				horizontal_diameter = strtold(optarg,NULL);
+				break;
+			case 'h':
+				vertical_diameter = strtold(optarg,NULL);
+				break;
 			case 'G':
 				/* Parse string */
 				parse_geometry(optarg);
 				break;
 		}
 
+	}
+
+	if(horizontal_diameter > 0) {
+		min_x = center_x - (horizontal_diameter / 2.0);
+		max_x = center_x + (horizontal_diameter / 2.0);
+	}
+	if(vertical_diameter > 0) {
+		min_y = center_y - (vertical_diameter / 2.0);
+		max_y = center_y + (vertical_diameter / 2.0);
 	}
 
 	// TODO: Check all variables for valid values
