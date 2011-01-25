@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	if(print_time) timer_start();
-	render(buffer_size, image);
+	render(image);
 	if(print_time) {
 		time = timer_check();
 		fprintf(stdout, "%lf\n", time);

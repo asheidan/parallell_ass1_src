@@ -4,7 +4,7 @@
 #include <math.h>
 #include <float.h>
 
-void render(unsigned int buffer_size, unsigned int *buffer) {
+void render(unsigned int *buffer) {
 	int
 		iteration,
 		x, y;
@@ -17,20 +17,10 @@ void render(unsigned int buffer_size, unsigned int *buffer) {
 		modulus, mu;
 
 
-	if(res_x > 1) {
-		interval_x = ( max_x - min_x ) / res_x;
-	}
-	else {
-		interval_x = ( max_x - min_x );
-	}
+	interval_x = ( max_x - min_x ) / res_x;
 	min_x += interval_x / 2.0;
 
-	if(res_y > 1) {
-		interval_y = ( max_y - min_y ) / res_y;
-	}
-	else {
-		interval_y = ( max_y - min_y );
-	}
+	interval_y = ( max_y - min_y ) / res_y;
 	max_y -= interval_y / 2.0;
 
 	T = threshold * threshold;
