@@ -10,11 +10,11 @@ unsigned int threshold = 2;
 unsigned int res_x = 600;
 unsigned int res_y = 400;
 
-long double min_x = -2.0;
-long double max_x =  1.0;
+coord_t min_x = -2.0;
+coord_t max_x =  1.0;
 
-long double min_y = -1.0;
-long double max_y =  1.0;
+coord_t min_y = -1.0;
+coord_t max_y =  1.0;
 
 unsigned int palette_size = 300;
 
@@ -90,7 +90,7 @@ void parse_geometry(const char *geometry) {
 }
 
 void parse_options(int argc, char *argv[]) {
-	long double
+	coord_t
 		center_x = 0, center_y = 0,
 		vertical_diameter = 0,
 		horizontal_diameter = 0;

@@ -14,6 +14,9 @@ int main(int argc, char *argv[]) {
 		buffer_size;
 	FILE *output;
 	double time;
+	coord_t
+		step_x,
+		step_y;
 
 	parse_options(argc,argv);
 	if(verbosity) {
@@ -44,8 +47,15 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+
+	step_x = ( max_x - min_x ) / res_x;
+	min_x += step_x / 2.0;
+
+	step_y = ( max_y - min_y ) / res_y;
+	max_y -= step_y / 2.0;
+
 	if(print_time) timer_start();
-	render(image);
+	render(image,step_x, step_y,0,res_x,0,res_y);
 	if(print_time) {
 		time = timer_check();
 		fprintf(stdout, "%lf\n", time);

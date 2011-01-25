@@ -4,32 +4,23 @@
 #include <math.h>
 #include <float.h>
 
-void render(unsigned int *buffer) {
+void render(unsigned int *buffer, coord_t step_x, coord_t step_y, int x_start, int x_end, int y_start, int y_end) {
 	int
 		iteration,
 		x, y;
-	long double
+	coord_t
 		T,
 		zr, zi, cr, ci,
 		tmp,
-		interval_x,
-		interval_y,
 		modulus, mu;
-
-
-	interval_x = ( max_x - min_x ) / res_x;
-	min_x += interval_x / 2.0;
-
-	interval_y = ( max_y - min_y ) / res_y;
-	max_y -= interval_y / 2.0;
 
 	T = threshold * threshold;
 
-	for(y = 0; y < res_y; y++) {
-		ci = max_y - interval_y * y;
-		for(x = 0; x < res_x; x++) {
+	for(y = y_start; y < y_end; y++) {
+		ci = max_y - step_y * y;
+		for(x = x_start; x < x_end; x++) {
 			zr = zi = 0;
-			cr = min_x + interval_x * x;
+			cr = min_x + step_x * x;
 			for(iteration = 0; (iteration < iteration_max) && ((zr*zr - zi*zi) <= T); iteration++) {
 				// z = z^2 + c;
 				tmp = zr*zr - zi*zi + cr;
