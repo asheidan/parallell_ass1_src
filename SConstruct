@@ -3,9 +3,7 @@ import platform
 
 env = Environment(ENV=os.environ)
 
-if(platform.system() == "Darwin"):
-	view = env.Command('view',ppm,'open $SOURCES')
-elif(platform.system() == "Linux"):
+if(platform.system() == "Linux"):
 	env.Append(LIBS=['m'])
 	env.Append(CFLAGS=['-std=c99'])
 
@@ -30,3 +28,8 @@ env.Command('desktop.ppm',target, './$SOURCE -P 300 -I 4000 -G 1920x1080 -x 0.15
 
 
 Default(target)
+
+if(platform.system() == "Darwin"):
+	view = env.Command('view',ppm,'open $SOURCES')
+elif(platform.system() == "Linux"):
+	view = env.Command('view',ppm,'xv $SOURCES')

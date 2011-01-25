@@ -41,11 +41,15 @@ void help(FILE *stream) {
 	fprintf(stream, "\tReal values\n");
 	fprintf(stream, "  -x, --min-x=REAL\t\tMinimum value for X\n");
 	fprintf(stream, "  -X, --max-x=REAL\t\tMaximum value for X\n");
+	fprintf(stream, "  -r, --center-x=REAL\t\tCenter value for X\n");
+	fprintf(stream, "  -w, --horizontal-diameter=DISTANCE\n\t\t\t\tValue intervall for X\n");
 	fprintf(stream, "\n");
 
 	fprintf(stream, "\tImaginary values\n");
 	fprintf(stream, "  -y, --min-y=IMAGINARY\t\tMinimum value for Y\n");
 	fprintf(stream, "  -Y, --max-y=IMAGINARY\t\tMaximum value for Y\n");
+	fprintf(stream, "  -i, --center-y=IMAGINARY\tCenter value for Y\n");
+	fprintf(stream, "  -h, --vertical-diameter=DISTANCE\n\t\t\t\tValue intervall for Y\n");
 	fprintf(stream, "\n");
 
 	fprintf(stream, "\tImage information\n");
@@ -176,7 +180,6 @@ void parse_options(int argc, char *argv[]) {
 				break;
 			case 'x':
 				min_x = strtold(optarg,NULL);
-				fprintf(stderr, "%s: %Le\n", optarg, min_x);
 				break;
 			case 'X':
 				max_x = strtold(optarg,NULL);
