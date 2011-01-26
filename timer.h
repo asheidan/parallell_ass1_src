@@ -3,6 +3,5 @@
 
 void timer_start();
 double timer_check();
-double timer_stop();
 
 #endif

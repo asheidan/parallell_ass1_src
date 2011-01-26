@@ -54,8 +54,12 @@ int main(int argc, char *argv[]) {
 	step_y = ( max_y - min_y ) / res_y;
 	max_y -= step_y / 2.0;
 
+	threshold = threshold * threshold;
+
 	if(print_time) timer_start();
+
 	render(image,step_x, step_y,0,res_x,0,res_y);
+
 	if(print_time) {
 		time = timer_check();
 		fprintf(stdout, "%lf\n", time);
