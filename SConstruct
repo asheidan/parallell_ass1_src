@@ -5,10 +5,9 @@ env = Environment(ENV=os.environ)
 
 if(platform.system() == "Linux"):
 	env.Append(LIBS=['m'])
-	env.Append(CFLAGS=['-std=c99'])
 
 env.Append(LIBS=['c'])
-env.Append(CFLAGS=['-Wall','-g'])
+env.Append(CFLAGS=['-Wall','-g','-std=c99','-pthread'])
 
 # Update tag index
 sources = Glob('*.[c]')
@@ -32,4 +31,6 @@ Default(target)
 if(platform.system() == "Darwin"):
 	view = env.Command('view',ppm,'open $SOURCES')
 elif(platform.system() == "Linux"):
-	view = env.Command('view',ppm,'xv $SOURCES')
+	view = env.Command('view',ppm,'xv $SOURCES &')
+
+png = env.Command('output.png',ppm,'convert $SOURCES $TARGET')
