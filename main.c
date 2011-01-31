@@ -62,14 +62,14 @@ int main(int argc, char *argv[]) {
 
 	threshold = threshold * threshold;
 
-	if(openmp > 0) {
+	if(openmp) {
 		if(verbosity > 0) {
 			fprintf(stderr, "OpenMP render: %u threads\n", openmp);
 		}
 		if(print_time) timer_start();
 		openmp_render(image,step_x, step_y,0,res_x,0,res_y);
 	}
-	if(pthreads > 0) {
+	else if(pthreads) {
 		if(verbosity > 0) {
 			fprintf(stderr, "Pthread render: %u threads\n", pthreads);
 		}

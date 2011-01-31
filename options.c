@@ -26,8 +26,12 @@ bool print_time = false;
 
 unsigned int verbosity = 0;
 
-unsigned int pthreads = 0;
-unsigned int openmp = 0;
+bool pthreads = false;
+bool openmp = false;
+
+unsigned int num_threads = 2;
+
+unsigned int magic_size = 0;
 
 void option_error(FILE *stream) {
 	fprintf(stream,"Try `%s --help` for more information.\n",PROG_NAME);
@@ -57,15 +61,15 @@ void help(FILE *stream) {
 
 	fprintf(stream, "\tImage information\n");
 	fprintf(stream, "  -G, --geometry=WIDTHxHEIGHT\tResolution of the image (ie 1280x1024)\n");
-	fprintf(stream, "  -P, --palette=COLORS\t\tNumber of colors in palette\n");
+	fprintf(stream, "  -p, --palette=COLORS\t\tNumber of colors in palette\n");
 	fprintf(stream, "  -S, --smoothing\t\tContinous smoothing of colors\n");
 	fprintf(stream, "\n");
 
 	fprintf(stream, "\tCalculation\n");
-	/*fprintf(stream, "  -M, --magic[=MINSIZE]\t\tUse magic boxes width minimum size of MINSIZE\n");*/
-	/*fprintf(stream, "      --threads[=NUMBER]\tUse NUMBER threads to calculate image\n");*/
-	/*fprintf(stream, "      --openmp\tUse OpenMP threads\n");*/
-	/*fprintf(stream, "      --pthread\tUse PThreads threads\n");*/
+	fprintf(stream, "  -M, --magic[=MINSIZE]\t\tUse magic boxes width minimum size of MINSIZE\n");
+	fprintf(stream, "      --threads[=NUMBER]\tUse NUMBER threads to calculate image\n");
+	fprintf(stream, "  -O, --openmp[=THREADS]\tUse OpenMP threads\n");
+	fprintf(stream, "  -P, --pthread[=THREADS]\tUse PThreads threads\n");
 	fprintf(stream, "  -I, --max-iter=ITERATIONS\tMaximum number of iterations\n");
 	fprintf(stream, "  -T, --threshold=VALUE\t\tThreshold value\n");
 	fprintf(stream, "  -t, --time\t\t\tPrint execution time on stdout\n");
@@ -115,8 +119,10 @@ void parse_options(int argc, char *argv[]) {
 		{"iterations", required_argument, 0, 'I'},
 		{"threshold", required_argument, 0, 'T'},
 
-		{"pthreads", optional_argument, 0, 'P'},
-		{"openmp", optional_argument, 0, 'O'},
+		{"threads", required_argument, 0, '|'},
+		{"pthreads", no_argument, 0, 'P'},
+		{"openmp", no_argument, 0, 'O'},
+		{"magic", optional_argument, 0, 'M'},
 
 		{"file", required_argument, 0, 'F'},
 		{"time", required_argument, 0, 't'},
@@ -128,7 +134,7 @@ void parse_options(int argc, char *argv[]) {
 	for(;;) {
 		int option_index;
 		int c;
-		c = getopt_long(argc, argv, "cSDtvF:I:T:P:x:X:y:Y:r:i:G:h:w:", long_options, &option_index);
+		c = getopt_long(argc, argv, "cSDtvF:I:T:p:x:X:y:Y:r:i:G:h:w:POM:", long_options, &option_index);
 
 		/* End of options */
 		if(c == -1) {
@@ -215,20 +221,25 @@ void parse_options(int argc, char *argv[]) {
 				/* Parse string */
 				parse_geometry(optarg);
 				break;
+			case '|':
+				num_threads = strtoul(optarg,NULL,0);
+				break;
 			case 'P':
-				if(optarg == NULL) {
-					pthreads = 1;
-				}
-				else {
-					pthreads = strtoul(optarg,NULL,0);
-				}
+				openmp = false;
+				pthreads = true;
 				break;
 			case 'O':
+				pthreads = false;
+				openmp = true;
+				break;
+			case 'M':
+				openmp = false;
+				pthreads = false;
 				if(optarg == NULL) {
-					openmp = 1;
+					magic_size = 256;
 				}
 				else {
-					openmp = strtoul(optarg,NULL,0);
+					magic_size = (unsigned int)strtoul(optarg, NULL, 0);
 				}
 				break;
 		}
