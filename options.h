@@ -30,6 +30,9 @@ extern bool print_time;
 
 extern unsigned int verbosity;
 
+extern unsigned int pthreads;
+extern unsigned int openmp;
+
 void usage(FILE *stream);
 void help(FILE *stream);
 

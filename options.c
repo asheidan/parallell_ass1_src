@@ -26,6 +26,9 @@ bool print_time = false;
 
 unsigned int verbosity = 0;
 
+unsigned int pthreads = 0;
+unsigned int openmp = 0;
+
 void option_error(FILE *stream) {
 	fprintf(stream,"Try `%s --help` for more information.\n",PROG_NAME);
 }
@@ -55,7 +58,7 @@ void help(FILE *stream) {
 	fprintf(stream, "\tImage information\n");
 	fprintf(stream, "  -G, --geometry=WIDTHxHEIGHT\tResolution of the image (ie 1280x1024)\n");
 	fprintf(stream, "  -P, --palette=COLORS\t\tNumber of colors in palette\n");
-	fprintf(stream, "  -C, --continuous\t\tContinous smoothing of colors\n");
+	fprintf(stream, "  -S, --smoothing\t\tContinous smoothing of colors\n");
 	fprintf(stream, "\n");
 
 	fprintf(stream, "\tCalculation\n");
@@ -100,18 +103,24 @@ void parse_options(int argc, char *argv[]) {
 		{"max-x", required_argument, 0, 'X'},
 		{"min-y", required_argument, 0, 'y'},
 		{"max-y", required_argument, 0, 'Y'},
-		{"geometry", required_argument, 0, 'G'},
-		{"iterations", required_argument, 0, 'I'},
-		{"palette", required_argument, 0, 'P'},
-		{"continous", no_argument, 0, 'C'},
-		{"threshold", required_argument, 0, 'T'},
-		{"file", required_argument, 0, 'F'},
-		{"time", required_argument, 0, 't'},
-		{"verbose", optional_argument, 0, 'v'},
+
 		{"center-x", required_argument, 0, 'r'},
 		{"center-y", required_argument, 0, 'i'},
 		{"real-diameter", required_argument, 0, 'w'},
 		{"imaginary-diameter", required_argument, 0, 'h'},
+
+		{"palette", required_argument, 0, 'p'},
+		{"smoothing", no_argument, 0, 'S'},
+		{"geometry", required_argument, 0, 'G'},
+		{"iterations", required_argument, 0, 'I'},
+		{"threshold", required_argument, 0, 'T'},
+
+		{"pthreads", optional_argument, 0, 'P'},
+		{"openmp", optional_argument, 0, 'O'},
+
+		{"file", required_argument, 0, 'F'},
+		{"time", required_argument, 0, 't'},
+		{"verbose", optional_argument, 0, 'v'},
 		{0, 0, 0, 0}
 	};
 
@@ -119,7 +128,7 @@ void parse_options(int argc, char *argv[]) {
 	for(;;) {
 		int option_index;
 		int c;
-		c = getopt_long(argc, argv, "cCDtvF:I:T:P:x:X:y:Y:r:i:G:h:w:", long_options, &option_index);
+		c = getopt_long(argc, argv, "cSDtvF:I:T:P:x:X:y:Y:r:i:G:h:w:", long_options, &option_index);
 
 		/* End of options */
 		if(c == -1) {
@@ -172,10 +181,10 @@ void parse_options(int argc, char *argv[]) {
 				/* Parse int */
 				threshold = (unsigned int)strtoul(optarg,NULL,0);
 				break;
-			case 'P':
+			case 'p':
 				palette_size = (unsigned int)strtoul(optarg,NULL,0);
 				break;
-			case 'C':
+			case 'S':
 				continous_smoothing = true;
 				break;
 			case 'x':
@@ -205,6 +214,22 @@ void parse_options(int argc, char *argv[]) {
 			case 'G':
 				/* Parse string */
 				parse_geometry(optarg);
+				break;
+			case 'P':
+				if(optarg == NULL) {
+					pthreads = 1;
+				}
+				else {
+					pthreads = strtoul(optarg,NULL,0);
+				}
+				break;
+			case 'O':
+				if(optarg == NULL) {
+					openmp = 1;
+				}
+				else {
+					openmp = strtoul(optarg,NULL,0);
+				}
 				break;
 		}
 

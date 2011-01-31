@@ -7,13 +7,19 @@
 #include "render.h"
 #include "timer.h"
 #include "ppm.h"
+#include "pthread_render.h"
+#include "openmp_render.h"
+
+void single_thread_render(unsigned int *image, coord_t step_x, coord_t step_y, int x_start, int x_end, int y_start, int y_end) {
+	render(image,step_x, step_y,x_start,x_end,y_start,y_end);
+}
 
 int main(int argc, char *argv[]) {
 	unsigned int *image;
 	unsigned int
 		buffer_size;
-	FILE *output;
 	double time;
+	FILE *output;
 	coord_t
 		step_x,
 		step_y;
@@ -56,9 +62,27 @@ int main(int argc, char *argv[]) {
 
 	threshold = threshold * threshold;
 
-	if(print_time) timer_start();
-
-	render(image,step_x, step_y,0,res_x,0,res_y);
+	if(openmp > 0) {
+		if(verbosity > 0) {
+			fprintf(stderr, "OpenMP render: %u threads\n", openmp);
+		}
+		if(print_time) timer_start();
+		openmp_render(image,step_x, step_y,0,res_x,0,res_y);
+	}
+	if(pthreads > 0) {
+		if(verbosity > 0) {
+			fprintf(stderr, "Pthread render: %u threads\n", pthreads);
+		}
+		if(print_time) timer_start();
+		pthread_render(image,step_x, step_y,0,res_x,0,res_y);
+	}
+	else {
+		if(verbosity > 0) {
+			fprintf(stderr, "Single thread render\n");
+		}
+		if(print_time) timer_start();
+		single_thread_render(image,step_x, step_y,0,res_x,0,res_y);
+	}
 
 	if(print_time) {
 		time = timer_check();
