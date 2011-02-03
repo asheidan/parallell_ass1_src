@@ -1,5 +1,6 @@
 #include "timer.h"
 #include <sys/time.h>
+#include <stdlib.h>
 
 struct timeval timevalue;
 

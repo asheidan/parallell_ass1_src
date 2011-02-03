@@ -11,8 +11,9 @@ env.Append(CCFLAGS=['-Wall','-pedantic','-g','-std=c99']) # ,'-Wextra'
 
 # ILHeap
 libirk_sources = ['libirk/' + f for f in ['ILHeap.c']]
-libirk_tags = env.Command('libirk/tags',libirk_sources,'ctags -f $TARGET --tag-relative=yes $SOURCES')
-Default(libirk_tags)
+if(platform.system() == 'Darwin'):
+	libirk_tags = env.Command('libirk/tags',libirk_sources,'ctags -f $TARGET --tag-relative=yes $SOURCES')
+	Default(libirk_tags)
 libirk = env.Library('irk',libirk_sources)
 Default(libirk)
 env.Append(LIBS=['irk'],LIBPATH=['.'],CPPPATH=['libirk'])

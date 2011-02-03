@@ -4,7 +4,7 @@
 #include <math.h>
 #include <float.h>
 
-unsigned int iterate(coord_t real, coord_t imag) {
+pixel_t iterate(coord_t real, coord_t imag) {
 	unsigned int
 		iteration, mu;
 	coord_t
@@ -56,7 +56,7 @@ unsigned int iterate(coord_t real, coord_t imag) {
 	}
 }
 
-void render(unsigned int *buffer, coord_t step_x, coord_t step_y, int x_start, int x_end, int y_start, int y_end) {
+void render(pixel_t *buffer, coord_t step_x, coord_t step_y, int x_start, int x_end, int y_start, int y_end) {
 	int
 		x, y;
 	coord_t

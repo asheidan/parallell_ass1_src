@@ -12,7 +12,7 @@ typedef struct {
 } worker_task_t;
 
 typedef struct {
-	unsigned int *buffer;
+	pixel_t *buffer;
 	coord_t step_x;
 	coord_t step_y;
 } image_info_t;

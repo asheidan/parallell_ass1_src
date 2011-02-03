@@ -3,7 +3,7 @@
 
 #include "coord.h"
 
-void openmp_render(unsigned int *image,
+void openmp_render(pixel_t *image,
 		coord_t step_x, coord_t step_y,
 		int x_start, int x_end,
 		int y_start, int y_end);

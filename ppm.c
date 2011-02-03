@@ -56,9 +56,9 @@ color_t *palette(unsigned int size) {
 	return colors;
 }
 
-void ppm_write(unsigned int width, unsigned int height , unsigned int *buffer, FILE *stream) {
+void ppm_write(unsigned int width, unsigned int height , pixel_t *buffer, FILE *stream) {
 	unsigned int buffer_size,i;
-	unsigned int tmp;
+	pixel_t tmp;
 	buffer_size = width * height;
 
 	color_t

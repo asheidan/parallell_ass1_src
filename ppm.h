@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
-void ppm_write(unsigned int width, unsigned int height , unsigned int *buffer, FILE *stream);
+#include "coord.h"
+
+void ppm_write(unsigned int width, unsigned int height , pixel_t *buffer, FILE *stream);
 
 #endif

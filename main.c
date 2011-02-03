@@ -10,12 +10,13 @@
 #include "pthread_render.h"
 #include "openmp_render.h"
 
-void single_thread_render(unsigned int *image, coord_t step_x, coord_t step_y, int x_start, int x_end, int y_start, int y_end) {
+void single_thread_render(pixel_t *image, coord_t step_x, coord_t step_y, int x_start, int x_end, int y_start, int y_end) {
 	render(image,step_x, step_y,x_start,x_end,y_start,y_end);
 }
 
 int main(int argc, char *argv[]) {
-	unsigned int *image;
+	pixel_t
+		*image;
 	unsigned int
 		buffer_size;
 	double time;
@@ -33,7 +34,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	buffer_size = res_x * res_y;
-	image = malloc(sizeof(unsigned int) * buffer_size);
+	image = malloc(sizeof(pixel_t) * buffer_size);
 	if(image == NULL) {
 		perror(PROG_NAME);
 		exit(3);
