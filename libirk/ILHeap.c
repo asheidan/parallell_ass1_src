@@ -51,23 +51,26 @@ void *ILHeapRemove(ILHeap *ih) {
 	entries = ih->entries;
 
 	data = entries[0].data;
+	
+	ih->size--;
+	if(ih->size > 0) {
+		ILHeapEntrySwap( &entries[0], &entries[ih->size] );
 
-	ILHeapEntrySwap( &entries[0], &entries[ih->size--] );
+		parent = 0;
+		child = 1;
 
-	parent = 0;
-	child = 1;
-
-	while( child < (ih->size - 1) ) {
-		if(entries[child].prio < entries[child+1].prio) {
-			child++;
-		}
-		if(entries[child].prio > entries[parent].prio) {
-			ILHeapEntrySwap(&entries[child],&entries[parent]);
-			parent = child;
-			child *= 2;
-		}
-		else {
-			return data;
+		while( child < (ih->size - 1) ) {
+			if(entries[child].prio < entries[child+1].prio) {
+				child++;
+			}
+			if(entries[child].prio > entries[parent].prio) {
+				ILHeapEntrySwap(&entries[child],&entries[parent]);
+				parent = child;
+				child *= 2;
+			}
+			else {
+				break;
+			}
 		}
 	}
 
@@ -96,8 +99,6 @@ void ILHeapInsert(ILHeap *ih, int priority, void *data) {
 		entries = ih->entries;
 	}
 
-	ih->size++;
-
 	child = ih->size;
 	parent = child / 2;
 
@@ -111,7 +112,10 @@ void ILHeapInsert(ILHeap *ih, int priority, void *data) {
 			parent /= 2;
 		}
 		else {
-			return;
+			break;
 		}
 	}
+
+	ih->size++;
+
 }

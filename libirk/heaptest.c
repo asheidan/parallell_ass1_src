@@ -25,7 +25,11 @@ int main(int argc, char **argv) {
 	for(i = 0; i < SIZE; i++) {
 		n = (int *)ILHeapRemove(ih);
 		/*fprintf(stderr, "%p\n", (void*)n);*/
-		if(n != NULL)
+		if(n != NULL) {
 			fprintf(stdout, "\t\t%12d\t%d\n", *n, ih->size);
+			free(n);
+		}
 	}
+
+	ILHeapFree(ih);
 }
