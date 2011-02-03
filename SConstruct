@@ -20,8 +20,7 @@ test = env.Program('libirk/heaptest.c')
 
 
 # Update tag index
-sources = Glob('*.[c]')
-tags = env.Command('tags',sources,'ctags $SOURCES')
+tags = env.Command('tags',Glob('*.[c]'),'ctags $SOURCES')
 # AlwaysBuild(tags)
 Default(tags)
 
@@ -29,7 +28,6 @@ Default(tags)
 clean = env.Command('clean',None,'rm -f *~')
 
 # OpenMP
-#env.Replace(CC=['gcc-mp-4.4'])
 env.Append(CFLAGS=['-fopenmp'])
 env.Append(LINKFLAGS=['-fopenmp'])
 openmp = env.Object('openmp_render.o','openmp_render.c')
@@ -37,13 +35,15 @@ openmp = env.Object('openmp_render.o','openmp_render.c')
 # PThread
 env.Append(CFLAGS=['-pthread'])
 env.Append(LINKFLAGS=['-pthread'])
-pthread = env.Object('pthread_render.o','pthread_render.c')
+pthread = [env.Object('pthread_render.o','pthread_render.c'),'pthread_common.c']
+
+# Magic
+magic = env.Object('magic_render.c')
 
 # Build target
-target = env.Program('frac',['main.c','options.c','timer.c','render.c','ppm.c'] + openmp + pthread)
+target = env.Program('frac',['main.c','options.c','timer.c','render.c','ppm.c'] + openmp + pthread + magic)
 
 ppm = env.Command('output.ppm',target,'./$SOURCE -Svv -p 300 -I 10000 -G 800x800 -x 0.155 -X 0.160 -y 0.635 -Y 0.640 -F$TARGET')
-
 env.Command('desktop.ppm',target, './$SOURCE -p 300 -I 4000 -G 1920x1080 -x 0.15306 -X 0.16194 -y 0.635 -Y 0.640 -S -T 4 -F$TARGET --openmp=2')
 
 
