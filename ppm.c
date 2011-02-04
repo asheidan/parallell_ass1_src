@@ -6,51 +6,94 @@
 #define R 0
 #define G 1
 #define B 2
+#define palette_location(X) (((X) * palette_size) / steps + 1)
 
-typedef unsigned char color_t[3];
+typedef unsigned char color_component_t;
+typedef color_component_t color_t[3];
 
+void fprintcolor(FILE *stream, color_t color) {
+	fprintf(stderr, "C: 0x%03x 0x%03x 0x%03x\t%3u %3u %3u \n",
+			color[R],
+			color[G],
+			color[B],
+			color[R],
+			color[G],
+			color[B]
+		);
+}
 color_t *palette(unsigned int size) {
 	color_t
 		*colors;
 	unsigned int
-		i, steps;
+		i, steps,
+		blue_low,
+		red_low;
+	color_component_t
+		red = 0,
+		green = 0,
+		blue = 0;
+
 	colors = malloc(sizeof(color_t) * (size + 1));
 	if(colors == NULL) {
 		perror(PROG_NAME);
+		fprintf(stderr, "colors\n");
 		exit(3);
 	}
 
-	colors[0][R] = 0;
-	colors[0][G] = 0;
-	colors[0][B] = 0;
+	colors[0][R] = red;
+	colors[0][G] = green;
+	colors[0][B] = blue;
 
-	steps = 1275;
+	blue_low = 50;
+	red_low = 100;
+	steps = 1275 - blue_low;
 
-	for(i = 1; i < 255; i++ ) {
-		colors[(i * palette_size) / steps + 1][R] = 1;
-		colors[(i * palette_size) / steps + 1][G] = 1;
-		colors[(i * palette_size) / steps + 1][B] = (i % 255) + 1;
+	/* Black to blue */
+	red = 0;
+	green = 0;
+	blue = blue_low + 1;
+	for(i = 1; blue > 0; i++ ) {
+		colors[palette_location(i)][R] = red;
+		colors[palette_location(i)][G] = green;
+		colors[palette_location(i)][B] = ++blue;
 	}
-	for(; i < 510; i++) {
-		colors[(i * palette_size) / steps + 1][R] = (i % 255) + 1;
-		colors[(i * palette_size) / steps + 1][G] = (i % 255) + 1;
-		colors[(i * palette_size) / steps + 1][B] = 255;
+	blue--;
+	/* Blue to white */
+	for(; red > 0 && green > 0; i++) {
+		colors[palette_location(i)][R] = ++red;
+		colors[palette_location(i)][G] = ++green;
+		colors[palette_location(i)][B] = blue;
 	}
-	for(; i < 765; i++) {
-		colors[(i * palette_size) / steps + 1][R] = 255;
-		colors[(i * palette_size) / steps + 1][G] = 255;
-		colors[(i * palette_size) / steps + 1][B] = 255 - ( i % 255 );
+	red--;
+	green--;
+	/* White to yellow */
+	for(; blue > 0; i++) {
+		colors[palette_location(i)][R] = red;
+		colors[palette_location(i)][G] = green;
+		colors[palette_location(i)][B] = --blue;
 	}
-	for(; i < 1020; i++) {
-		colors[(i * palette_size) / steps + 1][R] = 255;
-		colors[(i * palette_size) / steps + 1][G] = 255 - ( i % 255 );
-		colors[(i * palette_size) / steps + 1][B] = 1;
+	blue++;
+	/* Yellow to red */
+	for(; green > 0; i++) {
+		colors[palette_location(i)][R] = red;
+		colors[palette_location(i)][G] = --green;
+		colors[palette_location(i)][B] = blue;
 	}
-	for(; i < 1275; i++) {
-		colors[(i * palette_size) / steps + 1][R] = 255 - ( i % 255 );
-		colors[(i * palette_size) / steps + 1][G] = 1;
-		colors[(i * palette_size) / steps + 1][B] = 1;
+	green++;
+	/* Red to Dark */
+	for(; red > 0; i++) {
+		colors[palette_location(i)][R] = --red;
+		colors[palette_location(i)][G] = 1;
+		colors[palette_location(i)][B] = 1;
 	}
+	red++;
+	/* Dark Red to purple */
+	for(; i <  1275; i++) {
+		colors[palette_location(i)][R] = red;
+		colors[palette_location(i)][G] = green;
+		colors[palette_location(i)][B] = blue;
+	}
+
 	/*fprintf(stderr, "0x%02x%02x%02x\n", colors[i][R], colors[i][G], colors[i][B]);*/
 
 	return colors;

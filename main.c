@@ -7,23 +7,24 @@
 #include "render.h"
 #include "timer.h"
 #include "ppm.h"
+#include "pthread_common.h"
 #include "pthread_render.h"
 #include "openmp_render.h"
+#include "magic_render.h"
 
-void single_thread_render(pixel_t *image, coord_t step_x, coord_t step_y, int x_start, int x_end, int y_start, int y_end) {
-	render(image,step_x, step_y,x_start,x_end,y_start,y_end);
+void single_thread_render(image_info_t *info, worker_task_t *t) {
+	render(info,t);
 }
 
 int main(int argc, char *argv[]) {
-	pixel_t
-		*image;
 	unsigned int
 		buffer_size;
 	double time;
 	FILE *output;
-	coord_t
-		step_x,
-		step_y;
+	image_info_t
+		info;
+	worker_task_t
+		task;
 
 	parse_options(argc,argv);
 	if(verbosity) {
@@ -34,55 +35,71 @@ int main(int argc, char *argv[]) {
 	}
 
 	buffer_size = res_x * res_y;
-	image = malloc(sizeof(pixel_t) * buffer_size);
-	if(image == NULL) {
+	info.buffer = malloc(sizeof(pixel_t) * buffer_size);
+	if(info.buffer == NULL) {
 		perror(PROG_NAME);
+		fprintf(stderr, "info.buffer\n");
 		exit(3);
 	}
+	memset(info.buffer,0,sizeof(pixel_t) * buffer_size);
 
-	if(output_to_terminal) {
-		output = stdout;
-	}
-	else {
-		output = fopen(filename, "w");
-		if(output == NULL) {
-			fprintf(stderr,
-					"%s: Opening file '%s' for output failed: %s\n",
-					PROG_NAME, filename, strerror(errno)
-				);
-			exit(-4);
+	if(save_image) {
+		if(output_to_terminal) {
+			output = stdout;
+		}
+		else {
+			output = fopen(filename, "w");
+			if(output == NULL) {
+				fprintf(stderr,
+						"%s: Opening file '%s' for output failed: %s\n",
+						PROG_NAME, filename, strerror(errno)
+					);
+				exit(-4);
+			}
 		}
 	}
 
 
-	step_x = ( max_x - min_x ) / res_x;
-	min_x += step_x / 2.0;
+	info.step_x = ( max_x - min_x ) / res_x;
+	min_x += info.step_x / 2.0;
 
-	step_y = ( max_y - min_y ) / res_y;
-	max_y -= step_y / 2.0;
+	info.step_y = ( max_y - min_y ) / res_y;
+	max_y -= info.step_y / 2.0;
 
 	threshold = threshold * threshold;
 
-	if(openmp) {
+	task.x_start = 0;
+	task.x_end = res_x;
+	task.y_start = 0;
+	task.y_end = res_y;
+
+	if(magic_size > 0) {
 		if(verbosity > 0) {
-			fprintf(stderr, "OpenMP render: %u threads\n", openmp);
+			fprintf(stderr, "Magic render: %u threads\tmin size: %u\n", num_threads, magic_size);
 		}
 		if(print_time) timer_start();
-		openmp_render(image,step_x, step_y,0,res_x,0,res_y);
+		for(;num_runs > 0; num_runs--) magic_render( &info, &task );
+	}
+	else if(openmp) {
+		if(verbosity > 0) {
+			fprintf(stderr, "OpenMP render: %u threads\n", num_threads);
+		}
+		if(print_time) timer_start();
+		for(;num_runs > 0; num_runs--) openmp_render( &info, &task );
 	}
 	else if(pthreads) {
 		if(verbosity > 0) {
-			fprintf(stderr, "Pthread render: %u threads\n", pthreads);
+			fprintf(stderr, "Pthread render: %u threads\n", num_threads);
 		}
 		if(print_time) timer_start();
-		pthread_render(image,step_x, step_y,0,res_x,0,res_y);
+		for(;num_runs > 0; num_runs--) pthread_render( &info, &task );
 	}
 	else {
 		if(verbosity > 0) {
 			fprintf(stderr, "Single thread render\n");
 		}
 		if(print_time) timer_start();
-		single_thread_render(image,step_x, step_y,0,res_x,0,res_y);
+		for(;num_runs > 0; num_runs--) single_thread_render( &info, &task );
 	}
 
 	if(print_time) {
@@ -90,9 +107,11 @@ int main(int argc, char *argv[]) {
 		fprintf(stdout, "%lf\n", time);
 	}
 
-	ppm_write(res_x, res_y, image, output);
+	if(save_image) {
+		ppm_write(res_x, res_y, info.buffer, output);
+	}
 
-	free(image);
+	free(info.buffer);
 
 	return 0;
 }

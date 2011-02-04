@@ -45,9 +45,7 @@ void *work_thread(void *t) {
 	}
 }
 
-void pthread_render(
-		pixel_t *image, coord_t step_x, coord_t step_y,
-		int x_start, int x_end, int y_start, int y_end) {
+void pthread_render(image_info_t *info, worker_task_t *task) {
 	pthread_t
 		*worker_threads;
 	pthread_attr_t
@@ -56,24 +54,11 @@ void pthread_render(
 		i;
 	worker_argument_t
 		argument;
-	worker_task_t
-		task;
-	image_info_t
-		info;
 
-	argument.task = &task;
-	argument.info = &info;
+	argument.task = task;
+	argument.info = info;
 
-	info.step_x = step_x;
-	info.step_y = step_y;
-	info.buffer = image;
-
-	task.x_start = x_start;
-	task.x_end = x_end;
-	task.y_start = y_start;
-	task.y_end = y_end;
-
-	worker_threads = malloc(sizeof(pthread_t) * ( pthreads - 1 ));
+	worker_threads = malloc(sizeof(pthread_t) * ( num_threads - 1 ));
 	if(worker_threads == NULL) {
 		perror(PROG_NAME);
 		exit(3);
@@ -82,7 +67,7 @@ void pthread_render(
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-	progress = y_start;
+	progress = task->y_start;
 	
 	/* Creating threads */
 	for(i = 0; i < (num_threads - 1); i++) {
@@ -92,7 +77,7 @@ void pthread_render(
 	work_thread((void *)&argument);
 
 	/* Waiting for other threads to die */
-	for(i = 0; i < (pthreads - 1); i++) {
+	for(i = 0; i < (num_threads - 1); i++) {
 		pthread_join(worker_threads[i], NULL);
 	}
 

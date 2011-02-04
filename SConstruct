@@ -2,6 +2,7 @@ import os
 import platform
 
 env = Environment(ENV=os.environ)
+lib = Environment(ENV=os.environ)
 
 if(platform.system() == "Linux"):
 	env.Append(LIBS=['m'])
@@ -12,12 +13,12 @@ env.Append(CCFLAGS=['-Wall','-pedantic','-g','-std=c99']) # ,'-Wextra'
 # ILHeap
 libirk_sources = ['libirk/' + f for f in ['ILHeap.c']]
 if(platform.system() == 'Darwin'):
-	libirk_tags = env.Command('libirk/tags',libirk_sources,'ctags -f $TARGET --tag-relative=yes $SOURCES')
+	libirk_tags = lib.Command('libirk/tags',libirk_sources,'ctags -f $TARGET --tag-relative=yes $SOURCES')
 	Default(libirk_tags)
-libirk = env.Library('irk',libirk_sources)
+libirk = lib.Library('irk',libirk_sources)
 Default(libirk)
 env.Append(LIBS=['irk'],LIBPATH=['.'],CPPPATH=['libirk'])
-test = env.Program('libirk/heaptest.c')
+test = lib.Program('libirk/heaptest.c')
 
 
 # Update tag index
@@ -26,7 +27,7 @@ tags = env.Command('tags',Glob('*.[c]'),'ctags $SOURCES')
 Default(tags)
 
 # Clean up backup files
-clean = env.Command('clean',None,'rm -f *~')
+clean = env.Command('clean',None,'rm -f *~ **/*~')
 
 # OpenMP
 env.Append(CFLAGS=['-fopenmp'])

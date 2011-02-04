@@ -56,18 +56,18 @@ pixel_t iterate(coord_t real, coord_t imag) {
 	}
 }
 
-void render(pixel_t *buffer, coord_t step_x, coord_t step_y, int x_start, int x_end, int y_start, int y_end) {
+void render(image_info_t *info,worker_task_t *t) {
 	int
 		x, y;
 	coord_t
 		cr, ci;
 
-	for(y = y_start; y < y_end; y++) {
-		ci = max_y - step_y * y;
-		for(x = x_start; x < x_end; x++) {
-			cr = min_x + step_x * x;
+	for(y = t->y_start; y < t->y_end; y++) {
+		ci = max_y - info->step_y * y;
+		for(x = t->x_start; x < t->x_end; x++) {
+			cr = min_x + info->step_x * x;
 
-			buffer[res_x * y + x] = iterate(cr,ci);
+			info->buffer[res_x * y + x] = iterate(cr,ci);
 		}
 	}
 }

@@ -3,9 +3,7 @@
 #include "options.h"
 #include "render.h"
 
-void openmp_render(
-		pixel_t *image, coord_t step_x, coord_t step_y,
-		int x_start, int x_end, int y_start, int y_end) {
+void openmp_render(image_info_t *info, worker_task_t *task) {
 	int
 		x, y;
 	coord_t
@@ -15,12 +13,12 @@ void openmp_render(
 		/*fprintf(stderr, "t: %d\n", omp_get_thread_num());*/
 		/*fprintf(stderr, "T: %d\n", omp_get_num_threads());*/
 #pragma omp parallel for private(x,y,cr,ci) schedule(dynamic)
-	for(y = y_start; y < y_end; y++) {
-		ci = max_y - step_y * y;
-		for(x = x_start; x < x_end; x++) {
-			cr = min_x + step_x * x;
+	for(y = task->y_start; y < task->y_end; y++) {
+		ci = max_y - info->step_y * y;
+		for(x = task->x_start; x < task->x_end; x++) {
+			cr = min_x + info->step_x * x;
 
-			image[res_x * y + x] = iterate(cr,ci);
+			info->buffer[res_x * y + x] = iterate(cr,ci);
 			/*image[res_x * y + x] = iteration_max - omp_get_thread_num();*/
 
 		}

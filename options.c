@@ -20,9 +20,12 @@ unsigned int palette_size = 300;
 
 bool output_to_terminal = false;
 char *filename = "output.ppm";
+bool save_image = true;
 
 bool continous_smoothing = false;
 bool print_time = false;
+unsigned int num_runs = 1;
+bool show_magic = false;
 
 unsigned int verbosity = 0;
 
@@ -77,10 +80,13 @@ void help(FILE *stream) {
 
 	fprintf(stream, "  -F, --file=FILENAME\t\tThreshold value\n");
 	fprintf(stream, "  -c\t\t\t\tWrite image to stdout\n");
+	fprintf(stream, "  -d\t\t\t\tDon't save image\n");
 	fprintf(stream, "\n");
 
-	fprintf(stream, "  -h, --help\t\t\tShow this help message\n");
+	fprintf(stream, "  -n [EXECUTIONS]\t\tRun several times (for higher confidence in timings)\n");
+	fprintf(stream, "      --show-magic\t\tShow magic boxes in rendering\n");
 	fprintf(stream, "  -v, --verbose[=LEVEL]\t\tIncrease or set verbosity level\n");
+	fprintf(stream, "      --help\t\t\tShow this help message\n");
 }
 
 void usage_error(const char *message) {
@@ -127,6 +133,7 @@ void parse_options(int argc, char *argv[]) {
 		{"file", required_argument, 0, 'F'},
 		{"time", required_argument, 0, 't'},
 		{"verbose", optional_argument, 0, 'v'},
+		{"show-magic", no_argument, &show_magic, 1},
 		{0, 0, 0, 0}
 	};
 
@@ -134,7 +141,7 @@ void parse_options(int argc, char *argv[]) {
 	for(;;) {
 		int option_index;
 		int c;
-		c = getopt_long(argc, argv, "cSDtvF:I:T:p:x:X:y:Y:r:i:G:h:w:POM:", long_options, &option_index);
+		c = getopt_long(argc, argv, "cdSDtvF:I:T:p:x:X:y:Y:r:i:G:h:w:POM:n:", long_options, &option_index);
 
 		/* End of options */
 		if(c == -1) {
@@ -142,10 +149,6 @@ void parse_options(int argc, char *argv[]) {
 		}
 
 		switch(c) {
-			case '?':
-			case ':':
-				option_error(stderr);
-				exit(-1);
 			case 0:
 				/* A flag was already set */
 				if(long_options[option_index].flag != 0) {
@@ -162,6 +165,12 @@ void parse_options(int argc, char *argv[]) {
 				/*exit(1);*/
 			case 'c':
 				output_to_terminal = true;
+				break;
+			case 'd':
+				save_image = false;
+				break;
+			case 'n':
+				num_runs = (unsigned int)strtoul(optarg,NULL,0);
 				break;
 			case 't':
 				print_time = true;
@@ -242,6 +251,11 @@ void parse_options(int argc, char *argv[]) {
 					magic_size = (unsigned int)strtoul(optarg, NULL, 0);
 				}
 				break;
+			case ':':
+			case '?':
+			default:
+				option_error(stderr);
+				exit(-1);
 		}
 
 	}

@@ -24,9 +24,12 @@ extern unsigned int palette_size;
 
 extern bool output_to_terminal;
 extern char *filename;
+extern bool save_image;
 
 extern bool continous_smoothing;
 extern bool print_time;
+extern unsigned int num_runs;
+extern bool show_magic;
 
 extern unsigned int verbosity;
 
