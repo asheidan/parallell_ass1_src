@@ -6,13 +6,13 @@
 #define R 0
 #define G 1
 #define B 2
-#define palette_location(X) (((X) * palette_size) / steps + 1)
+#define palette_location(X) (((X) * size) / steps + 1)
 
 typedef unsigned char color_component_t;
 typedef color_component_t color_t[3];
 
 void fprintcolor(FILE *stream, color_t color) {
-	fprintf(stderr, "C: 0x%03x 0x%03x 0x%03x\t%3u %3u %3u \n",
+	fprintf(stderr, "C: 0x%02x%02x%02x\t%3u %3u %3u \n",
 			color[R],
 			color[G],
 			color[B],
@@ -46,52 +46,87 @@ color_t *palette(unsigned int size) {
 
 	blue_low = 50;
 	red_low = 100;
-	steps = 1275 - blue_low;
+	steps = 1275;
 
 	/* Black to blue */
 	red = 0;
 	green = 0;
-	blue = blue_low + 1;
-	for(i = 1; blue > 0; i++ ) {
+	blue = blue_low - 1;
+	for(i = 1; blue < 255; i++ ) {
 		colors[palette_location(i)][R] = red;
 		colors[palette_location(i)][G] = green;
 		colors[palette_location(i)][B] = ++blue;
+		
+		if(verbosity > 2) {
+			fprintf(stderr, "%4d ", i);
+			fprintcolor(stderr, colors[palette_location(i)]);
+		}
 	}
-	blue--;
 	/* Blue to white */
-	for(; red > 0 && green > 0; i++) {
+	for(; red < 255 && green < 255; i++) {
 		colors[palette_location(i)][R] = ++red;
 		colors[palette_location(i)][G] = ++green;
 		colors[palette_location(i)][B] = blue;
+		
+		if(verbosity > 2) {
+			fprintf(stderr, "%4d ", i);
+			fprintcolor(stderr, colors[palette_location(i)]);
+		}
 	}
-	red--;
-	green--;
 	/* White to yellow */
 	for(; blue > 0; i++) {
 		colors[palette_location(i)][R] = red;
 		colors[palette_location(i)][G] = green;
 		colors[palette_location(i)][B] = --blue;
+		
+		if(verbosity > 2) {
+			fprintf(stderr, "%4d ", i);
+			fprintcolor(stderr, colors[palette_location(i)]);
+		}
 	}
-	blue++;
 	/* Yellow to red */
 	for(; green > 0; i++) {
 		colors[palette_location(i)][R] = red;
 		colors[palette_location(i)][G] = --green;
 		colors[palette_location(i)][B] = blue;
+		
+		if(verbosity > 2) {
+			fprintf(stderr, "%4d ", i);
+			fprintcolor(stderr, colors[palette_location(i)]);
+		}
 	}
-	green++;
 	/* Red to Dark */
-	for(; red > 0; i++) {
+	for(; red > red_low; i++) {
 		colors[palette_location(i)][R] = --red;
-		colors[palette_location(i)][G] = 1;
-		colors[palette_location(i)][B] = 1;
-	}
-	red++;
-	/* Dark Red to purple */
-	for(; i <  1275; i++) {
-		colors[palette_location(i)][R] = red;
 		colors[palette_location(i)][G] = green;
 		colors[palette_location(i)][B] = blue;
+		
+		if(verbosity > 2) {
+			fprintf(stderr, "%4d ", i);
+			fprintcolor(stderr, colors[palette_location(i)]);
+		}
+	}
+	/* Dark Red to purple */
+	for(; blue < blue_low; i++) {
+		colors[palette_location(i)][R] = red;
+		colors[palette_location(i)][G] = green;
+		colors[palette_location(i)][B] = ++blue;
+		
+		if(verbosity > 2) {
+			fprintf(stderr, "%4d ", i);
+			fprintcolor(stderr, colors[palette_location(i)]);
+		}
+	}
+	/* Purple to blue */
+	for(; red > 1; i++) {
+		colors[palette_location(i)][R] = --red;
+		colors[palette_location(i)][G] = green;
+		colors[palette_location(i)][B] = blue;
+		
+		if(verbosity > 2) {
+			fprintf(stderr, "%4d ", i);
+			fprintcolor(stderr, colors[palette_location(i)]);
+		}
 	}
 
 	/*fprintf(stderr, "0x%02x%02x%02x\n", colors[i][R], colors[i][G], colors[i][B]);*/

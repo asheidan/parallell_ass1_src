@@ -289,4 +289,8 @@ void parse_options(int argc, char *argv[]) {
 	if(res_y < 1) {
 		usage_error("Image must have a height");
 	}
+
+	if(palette_size > 1275) {
+		usage_error("The palette-size should not be larger than 1275 color steps");
+	}
 }
