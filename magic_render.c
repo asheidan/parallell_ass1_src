@@ -1,6 +1,7 @@
 #include "magic_render.h"
 
 #include <stdlib.h>
+#include <unistd.h>
 #include <omp.h>
 
 #include "options.h"
@@ -18,7 +19,8 @@ bool work_done() {
 	for(i = 0; result && i < num_threads; i++) {
 		result = result && worker_status[i];
 	}
-	return !result;
+
+	return result;
 }
 
 void magic_queue_add(int x_start, int x_end, int y_start, int y_end, int priority) {
@@ -178,7 +180,7 @@ void magic_worker(void *a) {
 	
 	info = (image_info_t *)a;
 
-	while(work_done()) {
+	while(!work_done()) {
 		while((t  = magic_queue_get()) != NULL) {
 			worker_status[omp_get_thread_num()] = false;
 			/*
@@ -195,7 +197,10 @@ void magic_worker(void *a) {
 				render(info,t);
 			}
 			free(t);
-			worker_status[omp_get_thread_num()] = true;
+		}
+		worker_status[omp_get_thread_num()] = true;
+		if(t == NULL) {
+			usleep((useconds_t)idle_thread_wait);
 		}
 	}
 	/* TODO: What if the calculation isn't done but the queue is empty? */
@@ -212,17 +217,14 @@ void magic_openmp_render(image_info_t *info, worker_task_t *task) {
 
 	queue = ILHeapCreate();
 
-	omp_set_num_threads(num_threads);
-
 	worker_status = malloc(sizeof(bool) * num_threads);
 	if(worker_status == NULL) {
 		perror("frac");
 		if(verbosity > 3) fprintf(stderr, "worker_status\n");
 		exit(3);
 	}
-	worker_status[0] = false;
-	for(i = 1;i < num_threads; i++) {
-		worker_status[i] = true;
+	for(i = 0;i < num_threads; i++) {
+		worker_status[i] = false;
 	}
 
 
@@ -230,15 +232,20 @@ void magic_openmp_render(image_info_t *info, worker_task_t *task) {
 	if(!magic_split(task)) {
 		render(info,task);
 	}
+	else {
+
+	omp_set_num_threads(num_threads);
 
 	/* Create threads */
 #pragma omp parallel
-	{
+		{
 
-		magic_worker((void*)info);
+			magic_worker((void*)info);
+
+		}
+	/* Join threads */
 
 	}
-	/* Join threads */
 	ILHeapFree(queue);
 	free(worker_status);
 }

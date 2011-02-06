@@ -35,6 +35,7 @@ bool openmp = false;
 unsigned int num_threads = 2;
 
 unsigned int magic_size = 0;
+unsigned int idle_thread_wait = 100;
 
 void option_error(FILE *stream) {
 	fprintf(stream,"Try `%s --help` for more information.\n",PROG_NAME);
@@ -69,10 +70,11 @@ void help(FILE *stream) {
 	fprintf(stream, "\n");
 
 	fprintf(stream, "\tCalculation\n");
-	fprintf(stream, "  -M, --magic[=MINSIZE]\t\tUse magic boxes width minimum size of MINSIZE\n");
 	fprintf(stream, "      --threads[=NUMBER]\tUse NUMBER threads to calculate image\n");
 	fprintf(stream, "  -O, --openmp[=THREADS]\tUse OpenMP threads\n");
 	fprintf(stream, "  -P, --pthread[=THREADS]\tUse PThreads threads\n");
+	fprintf(stream, "  -M, --magic[=MINSIZE]\t\tUse magic boxes width minimum size of MINSIZE\n");
+	fprintf(stream, "      --idle-wait[=UTIME]\tMake idle threads wait UTIME before requesting more work\n");
 	fprintf(stream, "  -I, --max-iter=ITERATIONS\tMaximum number of iterations\n");
 	fprintf(stream, "  -T, --threshold=VALUE\t\tThreshold value\n");
 	fprintf(stream, "  -t, --time\t\t\tPrint execution time on stdout\n");
@@ -129,6 +131,7 @@ void parse_options(int argc, char *argv[]) {
 		{"pthreads", no_argument, 0, 'P'},
 		{"openmp", no_argument, 0, 'O'},
 		{"magic", optional_argument, 0, 'M'},
+		{"idle-wait", required_argument, 0, 'W'},
 
 		{"file", required_argument, 0, 'F'},
 		{"time", required_argument, 0, 't'},
@@ -250,6 +253,9 @@ void parse_options(int argc, char *argv[]) {
 				else {
 					magic_size = (unsigned int)strtoul(optarg, NULL, 0);
 				}
+				break;
+			case 'W':
+				idle_thread_wait = (unsigned int)strtoul(optarg, NULL, 0);
 				break;
 			case ':':
 			case '?':

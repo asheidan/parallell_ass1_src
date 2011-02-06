@@ -39,6 +39,7 @@ extern bool openmp;
 extern unsigned int num_threads;
 
 extern unsigned int magic_size;
+extern unsigned int idle_thread_wait;
 
 void usage(FILE *stream);
 void help(FILE *stream);
