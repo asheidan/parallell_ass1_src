@@ -38,6 +38,10 @@ if not conf.CheckCC():
 	print('Epic FAIL!!!')
 	Exit(0)
 
+if not conf.CheckFunc('usleep'):
+	print('Did not find usleep()')
+	Exit(0)
+
 conf.env['havectags'] = conf.CheckCtags()
 
 env = conf.Finish()
