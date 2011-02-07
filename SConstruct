@@ -38,6 +38,9 @@ if not conf.CheckCC():
 	print('Epic FAIL!!!')
 	Exit(0)
 
+if not conf.CheckCHeader('unistd.h'):
+	print('Did not find unistd.h')
+	Exit(0)
 if not conf.CheckFunc('usleep'):
 	print('Did not find usleep()')
 	Exit(0)
