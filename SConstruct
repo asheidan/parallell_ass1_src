@@ -31,31 +31,33 @@ lib = Environment(ENV=os.environ)
 
 # Configuration ##############################################################
 
-# if not env.GetOption('clean'):
 conf = Configure(env,custom_tests = {'CheckCtags' : CheckCtags})
+if not ( env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 
-if not conf.CheckCC():
-	print('Epic FAIL!!!')
-	Exit(0)
-
-if(env['PLATFORM'] == 'posix'):
-	# Akka
-	conf.env.Append(CPPDEFINES = '-D_XOPEN_SOURCE=500')
-if not conf.CheckCHeader('unistd.h'):
-	print('Did not find unistd.h')
-	Exit(0)
-if not conf.CheckFunc('usleep'):
-	print('Did not find usleep()')
-	Exit(0)
-
-if not conf.CheckFunc('sqrtl'):
-	print('Seems not to autolink math... -lm')
-	conf.env.Append(LIBS=['m'])
-	if not conf.CheckFunc('sqrtl'):
-		print('Did not find sqrtl()')
+	if not conf.CheckCC():
+		print('Epic FAIL!!!')
 		Exit(0)
 
-conf.env['havectags'] = conf.CheckCtags()
+	if(env['PLATFORM'] == 'posix'):
+		# Akka
+		conf.env.Append(CPPDEFINES = '-D_XOPEN_SOURCE=500')
+	if not conf.CheckCHeader('unistd.h'):
+		print('Did not find unistd.h')
+		Exit(0)
+	if not conf.CheckFunc('usleep'):
+		print('Did not find usleep()')
+		Exit(0)
+
+	if not conf.CheckFunc('sqrtl'):
+		print("\tSeems not to autolink math... -lm")
+		conf.env.Append(LIBS=['m'])
+		if not conf.CheckFunc('sqrtl'):
+			print('Did not find sqrtl()')
+			Exit(0)
+
+	conf.env['havectags'] = conf.CheckCtags()
+else:
+	conf.env['havectags'] = True
 
 env = conf.Finish()
 
