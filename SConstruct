@@ -10,6 +10,12 @@ def Valgrind(env, binary):
 	return env.Command('%s.dSYM' % binary[0], binary, 'valgrind --dsymutil=yes ./$SOURCE -G60x40')
 AddMethod(Environment,Valgrind)
 
+def CheckFlags(context,executable,flags):
+	context.Message('Check if %s supports %s...' % (executable, flags))
+	result = context.TryAction(action = '%s %s' % (executable, ' '.join(flags)))[0]
+	context.Result(result)
+	return result
+
 def CheckCtags(context):
 	context.Message('Checking for ctags...')
 	result = context.TryAction(action = 'ctags --version')[0]
@@ -36,7 +42,7 @@ if(SCons.__version__ >= '1.3.0'): print(env['PLATFORM_CPU'])
 # Configuration ##############################################################
 
 # EnsureSConsVersion(1,3,0)
-conf = Configure(env,custom_tests = {'CheckCtags' : CheckCtags})
+conf = Configure(env,custom_tests = {'CheckCtags' : CheckCtags, 'CheckFlags' : CheckFlags})
 if not ( conf.env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 
 	if(SCons.__version__ >= '1.3.0'):
@@ -61,9 +67,12 @@ if not ( conf.env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 			print('Did not find sqrtl()')
 			Exit(0)
 
-	conf.env['havectags'] = conf.CheckCtags()
+	if conf.CheckCtags():
+		conf.env['havectags'] = True
+		conf.env['havectagsrelative'] = conf.CheckFlags('ctags',['--relative=yes','--version'])
 else:
 	conf.env['havectags'] = True
+	conf.env['havectagsrelative'] = True
 
 env = conf.Finish()
 
@@ -74,7 +83,7 @@ env.Append(CCFLAGS=['-Wall','-pedantic','-g','-std=c99']) # ,'-Wextra'
 
 # ILHeap #####################################################################
 libirk_sources = ['libirk/' + f for f in ['ILHeap.c']]
-if(env['PLATFORM'] == 'darwin'):
+if(env['havectagsrelative']):
 	libirk_tags = env.Tags('libirk/tags',libirk_sources,relative=True)
 	Default(libirk_tags)
 libirk = lib.Library('irk',libirk_sources)
