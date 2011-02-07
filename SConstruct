@@ -1,6 +1,8 @@
 import os
 import subprocess
-# import platform
+import platform
+
+import SCons
 
 # Local Builders #############################################################
 
@@ -29,24 +31,28 @@ AddMethod(Environment,Tags)
 env = Environment(ENV=os.environ)
 lib = Environment(ENV=os.environ)
 
+print("Platform: %s(%s)" % ( platform.system(), env['PLATFORM'] ))
+if(SCons.__version__ >= '1.3.0'): print(env['PLATFORM_CPU'])
 # Configuration ##############################################################
 
+# EnsureSConsVersion(1,3,0)
 conf = Configure(env,custom_tests = {'CheckCtags' : CheckCtags})
-if not ( env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
+if not ( conf.env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 
-	if not conf.CheckCC():
-		print('Epic FAIL!!!')
-		Exit(0)
+	if(SCons.__version__ >= '1.3.0'):
+		if not conf.CheckCC():
+			print('Epic FAIL!!!')
+			Exit(0)
 
-	if(env['PLATFORM'] == 'posix'):
-		# Akka
-		conf.env.Append(CPPDEFINES = '-D_XOPEN_SOURCE=500')
 	if not conf.CheckCHeader('unistd.h'):
 		print('Did not find unistd.h')
 		Exit(0)
 	if not conf.CheckFunc('usleep'):
 		print('Did not find usleep()')
 		Exit(0)
+	if(conf.CheckType('useconds_t','#include <unistd.h>\n')):
+		# Akka
+		conf.env.Append(CPPDEFINES = '-D_XOPEN_SOURCE=500')
 
 	if not conf.CheckFunc('sqrtl'):
 		print("\tSeems not to autolink math... -lm")
@@ -106,7 +112,7 @@ Default(target)
 
 if(env['PLATFORM'] == "darwin"):
 	view = env.Command('view',ppm,'open $SOURCES')
-elif(env['PLATFORM'] == "linux"):
+elif(env['PLATFORM'] == "posix"):
 	view = env.Command('view',ppm,'xv $SOURCES &')
 
 png = env.Command('output.png',ppm,'convert $SOURCES $TARGET')
