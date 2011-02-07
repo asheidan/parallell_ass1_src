@@ -40,7 +40,7 @@ env = Environment(ENV=os.environ)
 lib = Environment(ENV=os.environ)
 
 print("Platform: %s(%s)" % ( platform.system(), env['PLATFORM'] ))
-if(SCons.__version__ >= '1.3.0'): print(env['PLATFORM_CPU'])
+#if(SCons.__version__ >= '1.3.0'): print(env['PLATFORM_CPU'])
 # Configuration ##############################################################
 
 # EnsureSConsVersion(1,3,0)
@@ -58,20 +58,23 @@ if not ( conf.env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 	if not conf.CheckFunc('usleep'):
 		print('Did not find usleep()')
 		Exit(0)
-	if(conf.CheckType('useconds_t','#include <unistd.h>\n')):
+	if not conf.CheckType('useconds_t','#include <unistd.h>\n'):
 		# Akka
 		conf.env.Append(CPPDEFINES = '-D_XOPEN_SOURCE=500')
 
 	if not conf.CheckFunc('sqrtl'):
 		print("\tSeems not to autolink math... -lm")
-		conf.env.Append(LIBS=['m'])
-		if not conf.CheckFunc('sqrtl'):
+		if conf.CheckFunc('m'):
+			conf.env.Append(LIBS=['m'])
+		elif conf.CheckFunc('sqrtl'):
+			print('yo')
+		else:
 			print('Did not find sqrtl()')
 			Exit(0)
 
 	if conf.CheckCtags():
 		conf.env['havectags'] = True
-		conf.env['havectagsrelative'] = conf.CheckFlags('ctags',['--relative=yes','--version'])
+		conf.env['havectagsrelative'] = conf.CheckFlags('ctags',['--tag-relative=yes','--version'])
 else:
 	conf.env['havectags'] = True
 	conf.env['havectagsrelative'] = True
@@ -133,5 +136,7 @@ Clean(target,valgrind)
 
 # Clean up backup files
 clean = env.Command('clean',None,'rm -rf *~ **/*~ %s' % ' '.join(str(x) for x in valgrind))
-if(env.GetOption('clean')):
+if(env.GetOption('clean') or ('clean' in COMMAND_LINE_TARGETS)):
+	print("Cleaning")
+	Clean('clean',[target,libirk])
 	Default(clean)
