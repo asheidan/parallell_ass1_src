@@ -49,7 +49,11 @@ if not conf.CheckFunc('usleep'):
 	Exit(0)
 
 if not conf.CheckFunc('sqrtl'):
+	print('Seems not to autolink math... -lm')
 	conf.env.Append(LIBS=['m'])
+	if not conf.CheckFunc('sqrtl'):
+		print('Did not find sqrtl()')
+		Exit(0)
 
 conf.env['havectags'] = conf.CheckCtags()
 
