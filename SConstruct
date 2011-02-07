@@ -1,6 +1,6 @@
 import os
 import subprocess
-import platform
+# import platform
 
 # Local Builders #############################################################
 
@@ -38,6 +38,9 @@ if not conf.CheckCC():
 	print('Epic FAIL!!!')
 	Exit(0)
 
+if(env['PLATFORM'] == 'posix'):
+	# Akka
+	conf.env.Append(CDEFINES = '-D_XOPEN_SOURCE=500')
 if not conf.CheckCHeader('unistd.h'):
 	print('Did not find unistd.h')
 	Exit(0)
@@ -51,7 +54,7 @@ env = conf.Finish()
 
 ##############################################################################
 
-if(platform.system() == "Linux"):
+if(env['PLATFORM'] == "linux"):
 	env.Append(LIBS=['m'])
 
 env.Append(LIBS=['c'])
@@ -59,7 +62,7 @@ env.Append(CCFLAGS=['-Wall','-pedantic','-g','-std=c99']) # ,'-Wextra'
 
 # ILHeap #####################################################################
 libirk_sources = ['libirk/' + f for f in ['ILHeap.c']]
-if(platform.system() == 'Darwin'):
+if(env['PLATFORM'] == 'darwin'):
 	libirk_tags = env.Tags('libirk/tags',libirk_sources,relative=True)
 	Default(libirk_tags)
 libirk = lib.Library('irk',libirk_sources)
@@ -95,9 +98,9 @@ env.Command('desktop.ppm',target, './$SOURCE -p 300 -I 4000 -G 1920x1080 -x 0.15
 
 Default(target)
 
-if(platform.system() == "Darwin"):
+if(env['PLATFORM'] == "darwin"):
 	view = env.Command('view',ppm,'open $SOURCES')
-elif(platform.system() == "Linux"):
+elif(env['PLATFORM'] == "linux"):
 	view = env.Command('view',ppm,'xv $SOURCES &')
 
 png = env.Command('output.png',ppm,'convert $SOURCES $TARGET')
