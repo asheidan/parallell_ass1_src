@@ -46,7 +46,7 @@ color_t *palette(unsigned int size) {
 
 	blue_low = 50;
 	red_low = 100;
-	steps = 1275;
+	steps = 1276;
 
 	/* Black to blue */
 	red = 0;
@@ -129,7 +129,14 @@ color_t *palette(unsigned int size) {
 		}
 	}
 
-	/*fprintf(stderr, "0x%02x%02x%02x\n", colors[i][R], colors[i][G], colors[i][B]);*/
+	/*
+	i--;
+	fprintf(stderr, "%d[%d]\t0x%02x%02x%02x\n",
+			i,palette_location(i),
+			colors[palette_location(i)][R],
+			colors[palette_location(i)][G],
+			colors[palette_location(i)][B]);
+	*/
 
 	return colors;
 }
