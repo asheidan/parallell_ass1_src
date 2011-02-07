@@ -33,7 +33,9 @@ def Tags(env, target = 'tags', sources = Glob('*.c'),relative = False):
 AddMethod(Environment,Tags)
 
 ##############################################################################
+build = Dir('build')
 
+VariantDir('build','src',duplicate = 0)
 env = Environment(ENV=os.environ)
 lib = Environment(ENV=os.environ)
 
@@ -82,36 +84,36 @@ env.Append(LIBS=['c'])
 env.Append(CCFLAGS=['-Wall','-pedantic','-g','-std=c99']) # ,'-Wextra'
 
 # ILHeap #####################################################################
-libirk_sources = ['libirk/' + f for f in ['ILHeap.c']]
+libirk_sources = [str(build) + '/libirk/' + f for f in ['ILHeap.c']]
 if(env['havectagsrelative']):
 	libirk_tags = env.Tags('libirk/tags',libirk_sources,relative=True)
-	Default(libirk_tags)
+	# Default(libirk_tags)
 libirk = lib.Library('irk',libirk_sources)
 Default(libirk)
-env.Append(LIBS=['irk'],LIBPATH=['.'],CPPPATH=['libirk'])
+env.Append(LIBS=['irk'],LIBPATH=['.'],CPPPATH=['src/libirk'])
 test = lib.Program('libirk/heaptest.c')
 
 
 # Update tag index ###########################################################
 tags = env.Tags()
 # AlwaysBuild(tags)
-Default(tags)
+# Default(tags)
 
 # OpenMP #####################################################################
 env.Append(CFLAGS=['-fopenmp'])
 env.Append(LINKFLAGS=['-fopenmp'])
-openmp = env.Object('openmp_render.o','openmp_render.c')
+openmp = ['openmp_render.c']
 
 # PThread ####################################################################
 env.Append(CFLAGS=['-pthread'])
 env.Append(LINKFLAGS=['-pthread'])
-pthread = [env.Object('pthread_render.o','pthread_render.c'),'pthread_common.c']
+pthread = ['pthread_render.c','pthread_common.c']
 
 # Magic ######################################################################
-magic = env.Object('magic_render.c')
+magic = ['magic_render.c']
 
 # Build target ###############################################################
-target = env.Program('frac',Split('main.c options.c timer.c render.c ppm.c') + openmp + pthread + magic)
+target = env.Program('frac',[str(build) + '/' + str(x) for x in (Split('main.c options.c timer.c render.c ppm.c') + openmp + pthread + magic)])
 
 ppm = env.Command('output.ppm',target,'./$SOURCE -Svv -p 300 -I 10000 -G 800x800 -x 0.155 -X 0.160 -y 0.635 -Y 0.640 -F$TARGET')
 env.Command('desktop.ppm',target, './$SOURCE -p 300 -I 4000 -G 1920x1080 -x 0.15306 -X 0.16194 -y 0.635 -Y 0.640 -S -T 4 -F$TARGET --threads=2 -M 32')
