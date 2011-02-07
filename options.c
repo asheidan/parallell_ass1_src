@@ -136,7 +136,7 @@ void parse_options(int argc, char *argv[]) {
 		{"file", required_argument, 0, 'F'},
 		{"time", required_argument, 0, 't'},
 		{"verbose", optional_argument, 0, 'v'},
-		{"show-magic", no_argument, &show_magic, 1},
+		{"show-magic", no_argument, (int*)&show_magic, 1},
 		{0, 0, 0, 0}
 	};
 
