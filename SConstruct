@@ -40,7 +40,7 @@ if not conf.CheckCC():
 
 if(env['PLATFORM'] == 'posix'):
 	# Akka
-	conf.env.Append(CDEFINES = '-D_XOPEN_SOURCE=500')
+	conf.env.Append(CPPDEFINES = '-D_XOPEN_SOURCE=500')
 if not conf.CheckCHeader('unistd.h'):
 	print('Did not find unistd.h')
 	Exit(0)
@@ -48,14 +48,14 @@ if not conf.CheckFunc('usleep'):
 	print('Did not find usleep()')
 	Exit(0)
 
+if not conf.CheckFunc('sqrtl'):
+	conf.env.Append(LIBS=['m'])
+
 conf.env['havectags'] = conf.CheckCtags()
 
 env = conf.Finish()
 
 ##############################################################################
-
-if(env['PLATFORM'] == "linux"):
-	env.Append(LIBS=['m'])
 
 env.Append(LIBS=['c'])
 env.Append(CCFLAGS=['-Wall','-pedantic','-g','-std=c99']) # ,'-Wextra'
