@@ -52,6 +52,11 @@ if not ( conf.env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 			print('Epic FAIL!!!')
 			Exit(0)
 
+	if conf.CheckLib('c'):
+		conf.env.Append(LIBS=['c'])
+	else:
+		print('You need LibC')
+	
 	if not conf.CheckCHeader('unistd.h'):
 		print('Did not find unistd.h')
 		Exit(0)
@@ -64,7 +69,7 @@ if not ( conf.env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 
 	if not conf.CheckFunc('sqrtl'):
 		print("\tSeems not to autolink math... -lm")
-		if conf.CheckFunc('m'):
+		if conf.CheckLib('m'):
 			conf.env.Append(LIBS=['m'])
 		elif conf.CheckFunc('sqrtl'):
 			print('yo')
@@ -83,7 +88,6 @@ env = conf.Finish()
 
 ##############################################################################
 
-env.Append(LIBS=['c'])
 env.Append(CCFLAGS=['-Wall','-pedantic','-g','-std=c99']) # ,'-Wextra'
 
 # ILHeap #####################################################################
