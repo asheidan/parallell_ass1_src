@@ -6,7 +6,7 @@
 #include "coord.h"
 
 typedef struct {
-	int
+	unsigned int
 		x_start, x_end,
 		y_start, y_end;
 } worker_task_t;

@@ -12,7 +12,7 @@
 int progress;
 
 void *work_thread(void *t) {
-	int
+	unsigned int
 		x, y;
 	coord_t
 		cr, ci;

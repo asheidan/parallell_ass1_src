@@ -15,7 +15,7 @@ bool *worker_status;
 
 bool work_done() {
 	bool result = true;
-	int i;
+	unsigned int i;
 	for(i = 0; result && i < num_threads; i++) {
 		result = result && worker_status[i];
 	}
@@ -49,7 +49,7 @@ worker_task_t *magic_queue_get() {
 }
 
 bool magic_split(worker_task_t *t) {
-	int
+	unsigned int
 		x_size, y_size,
 		x_start, x_end,
 		y_start, y_end;
@@ -82,7 +82,7 @@ bool magic_outline(image_info_t *info,worker_task_t *task) {
 	pixel_t
 		previous, *current,
 		*image;
-	int
+	unsigned int
 		x, y;
 	coord_t
 		cr, ci,
@@ -212,7 +212,7 @@ void magic_render(image_info_t *info, worker_task_t *task) {
 	magic_openmp_render(info, task);
 }
 void magic_openmp_render(image_info_t *info, worker_task_t *task) {
-	int
+	unsigned int
 		i;
 
 	queue = ILHeapCreate();

@@ -57,7 +57,7 @@ pixel_t iterate(coord_t real, coord_t imag) {
 }
 
 void render(image_info_t *info,worker_task_t *t) {
-	int
+	unsigned int
 		x, y;
 	coord_t
 		cr, ci;

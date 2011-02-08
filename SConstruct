@@ -52,14 +52,13 @@ if not ( conf.env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 			print('Epic FAIL!!!')
 			Exit(0)
 
-	if conf.CheckLib('c'):
-		conf.env.Append(LIBS=['c'])
-	else:
+	if not conf.CheckLib('c'):
 		print('You need LibC')
-	
-	if not conf.CheckCHeader('unistd.h'):
-		print('Did not find unistd.h')
 		Exit(0)
+	
+	# if not conf.CheckCHeader('unistd.h'):
+	# 	print('Did not find unistd.h')
+	# 	Exit(0)
 	if not conf.CheckFunc('usleep'):
 		print('Did not find usleep()')
 		Exit(0)
@@ -69,11 +68,7 @@ if not ( conf.env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 
 	if not conf.CheckFunc('sqrtl'):
 		print("\tSeems not to autolink math... -lm")
-		if conf.CheckLib('m'):
-			conf.env.Append(LIBS=['m'])
-		elif conf.CheckFunc('sqrtl'):
-			print('yo')
-		else:
+		if not( conf.CheckLib('m') and conf.CheckFunc('sqrtl') ):
 			print('Did not find sqrtl()')
 			Exit(0)
 
@@ -88,10 +83,10 @@ env = conf.Finish()
 
 ##############################################################################
 
-env.Append(CCFLAGS=['-Wall','-pedantic','-g','-std=c99']) # ,'-Wextra'
+env.Append(CCFLAGS=['-Wall','-Wextra' ,'-pedantic','-g','-std=c99']) # 
 
 # ILHeap #####################################################################
-libirk_sources = [str(build) + '/libirk/' + f for f in ['ILHeap.c']]
+libirk_sources = [os.path.join(str(build), 'libirk', f) for f in ['ILHeap.c']]
 if(env['havectagsrelative']):
 	libirk_tags = env.Tags('libirk/tags',libirk_sources,relative=True)
 	# Default(libirk_tags)
@@ -120,7 +115,7 @@ pthread = ['pthread_render.c','pthread_common.c']
 magic = ['magic_render.c']
 
 # Build target ###############################################################
-target = env.Program('frac',[str(build) + '/' + str(x) for x in (Split('main.c options.c timer.c render.c ppm.c') + openmp + pthread + magic)])
+target = env.Program('frac',[os.path.join(str(build), str(x)) for x in (Split('main.c options.c timer.c render.c ppm.c') + openmp + pthread + magic)])
 
 ppm = env.Command('output.ppm',target,'./$SOURCE -Svv -p 300 -I 10000 -G 800x800 -x 0.155 -X 0.160 -y 0.635 -Y 0.640 -F$TARGET')
 env.Command('desktop.ppm',target, './$SOURCE -p 300 -I 4000 -G 1920x1080 -x 0.15306 -X 0.16194 -y 0.635 -Y 0.640 -S -T 4 -F$TARGET --threads=2 -M 32')

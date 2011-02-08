@@ -12,7 +12,7 @@ typedef unsigned char color_component_t;
 typedef color_component_t color_t[3];
 
 void fprintcolor(FILE *stream, color_t color) {
-	fprintf(stderr, "C: 0x%02x%02x%02x\t%3u %3u %3u \n",
+	fprintf(stream, "C: 0x%02x%02x%02x\t%3u %3u %3u \n",
 			color[R],
 			color[G],
 			color[B],
