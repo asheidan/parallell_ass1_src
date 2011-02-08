@@ -41,6 +41,9 @@ lib = Environment(ENV=os.environ)
 
 print("Platform: %s(%s)" % ( platform.system(), env['PLATFORM'] ))
 #if(SCons.__version__ >= '1.3.0'): print(env['PLATFORM_CPU'])
+
+env.Append(CCFLAGS=['-Wall','-Wextra' ,'-pedantic','-g','-std=c99']) # 
+
 # Configuration ##############################################################
 
 # EnsureSConsVersion(1,3,0)
@@ -56,11 +59,11 @@ if not ( env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 		print('You need LibC')
 		Exit(0)
 	
-	# if not conf.CheckCHeader('unistd.h'):
-	# 	print('Did not find unistd.h')
-	# 	Exit(0)
+	if not conf.CheckCHeader('unistd.h'):
+		print('Did not find unistd.h')
+		Exit(0)
 	if not conf.CheckType('useconds_t','#include <unistd.h>'):
-		# Akka
+		# Akka/Linux/Posix (Depends on std probably
 		conf.env.Append(CPPDEFINES = {'_XOPEN_SOURCE':500})
 	if not conf.CheckFunc('usleep'):
 		print('Did not find usleep()')
@@ -87,7 +90,6 @@ else:
 
 ##############################################################################
 
-env.Append(CCFLAGS=['-Wall','-Wextra' ,'-pedantic','-g','-std=c99']) # 
 
 # ILHeap #####################################################################
 libirk_sources = [os.path.join(str(build), 'libirk', f) for f in ['ILHeap.c']]
