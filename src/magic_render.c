@@ -159,6 +159,7 @@ bool magic_outline(image_info_t *info,worker_task_t *task) {
 			previous = palette_size / 2 - palette_size / 10;
 		}
 	}
+	/* Fill */
 	for(y = task->y_start + 1; y < (task->y_end - 1); y++) {
 		/*current = image + (res_y * y);*/
 		/*current++;*/
