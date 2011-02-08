@@ -59,7 +59,7 @@ if not ( env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 	# if not conf.CheckCHeader('unistd.h'):
 	# 	print('Did not find unistd.h')
 	# 	Exit(0)
-	if not conf.CheckType('useconds_t','#include <unistd.h>\n'):
+	if not conf.CheckType('useconds_t','#include <unistd.h>'):
 		# Akka
 		conf.env.Append(CPPDEFINES = {'_XOPEN_SOURCE':500})
 	if not conf.CheckFunc('usleep'):
@@ -139,7 +139,7 @@ Clean(target,valgrind)
 
 # Clean up backup files
 clean = env.Command('clean',None,'rm -rf *~ **/*~ %s' % ' '.join(str(x) for x in valgrind))
-env.Clean('distclean',['.sconf_temp','config.log','.sconsign.dblite'])
+env.Clean('distclean',[target,libirk,'build','.sconf_temp','config.log','.sconsign.dblite'])
 if(env.GetOption('clean') or ('clean' in COMMAND_LINE_TARGETS)):
 	print("Cleaning")
 	Clean('clean',[target,libirk])
