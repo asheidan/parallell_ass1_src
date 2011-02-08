@@ -44,8 +44,8 @@ print("Platform: %s(%s)" % ( platform.system(), env['PLATFORM'] ))
 # Configuration ##############################################################
 
 # EnsureSConsVersion(1,3,0)
-conf = Configure(env,custom_tests = {'CheckCtags' : CheckCtags, 'CheckFlags' : CheckFlags})
-if not ( conf.env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
+if not ( env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
+	conf = Configure(env,custom_tests = {'CheckCtags' : CheckCtags, 'CheckFlags' : CheckFlags})
 
 	if(SCons.__version__ >= '1.3.0'):
 		if not conf.CheckCC():
@@ -59,12 +59,12 @@ if not ( conf.env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 	# if not conf.CheckCHeader('unistd.h'):
 	# 	print('Did not find unistd.h')
 	# 	Exit(0)
+	if not conf.CheckType('useconds_t','#include <unistd.h>\n'):
+		# Akka
+		conf.env.Append(CPPDEFINES = {'_XOPEN_SOURCE':500})
 	if not conf.CheckFunc('usleep'):
 		print('Did not find usleep()')
 		Exit(0)
-	if not conf.CheckType('useconds_t','#include <unistd.h>\n'):
-		# Akka
-		conf.env.Append(CPPDEFINES = '-D_XOPEN_SOURCE=500')
 
 	if not conf.CheckFunc('sqrtl'):
 		print("\tSeems not to autolink math... -lm")
@@ -75,11 +75,15 @@ if not ( conf.env.GetOption('clean') or 'clean' in COMMAND_LINE_TARGETS) :
 	if conf.CheckCtags():
 		conf.env['havectags'] = True
 		conf.env['havectagsrelative'] = conf.CheckFlags('ctags',['--tag-relative=yes','--version'])
-else:
-	conf.env['havectags'] = True
-	conf.env['havectagsrelative'] = True
+	else:
+		conf.env['havectags'] = False
+		conf.env['havectagsrelative'] = False
 
-env = conf.Finish()
+	env = conf.Finish()
+else:
+	env['havectags'] = True
+	env['havectagsrelative'] = True
+
 
 ##############################################################################
 
@@ -135,6 +139,7 @@ Clean(target,valgrind)
 
 # Clean up backup files
 clean = env.Command('clean',None,'rm -rf *~ **/*~ %s' % ' '.join(str(x) for x in valgrind))
+env.Clean('distclean',['.sconf_temp','config.log','.sconsign.dblite'])
 if(env.GetOption('clean') or ('clean' in COMMAND_LINE_TARGETS)):
 	print("Cleaning")
 	Clean('clean',[target,libirk])
