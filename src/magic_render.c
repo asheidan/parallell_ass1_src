@@ -34,17 +34,19 @@ void magic_queue_add(int x_start, int x_end, int y_start, int y_end, int priorit
 	task->y_start = y_start;
 	task->y_end = y_end;
 
-	pthread_mutex_lock( &queue_lock );
-	ILHeapInsert(queue, priority, (void*)task);
-	pthread_mutex_unlock( &queue_lock);
+#	pragma omp critical
+	{
+		ILHeapInsert(queue, priority, (void*)task);
+	}
 }
 
 worker_task_t *magic_queue_get() {
 	worker_task_t
 		*task;
-	pthread_mutex_lock( &queue_lock );
-	task = (worker_task_t *)ILHeapRemove(queue);
-	pthread_mutex_unlock( &queue_lock );
+#	pragma omp critical
+	{
+		task = (worker_task_t *)ILHeapRemove(queue);
+	}
 	return task;
 }
 
